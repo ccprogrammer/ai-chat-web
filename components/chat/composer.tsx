@@ -5,7 +5,11 @@ import type { AIModel } from "@/types";
 
 const MODELS: { value: AIModel; label: string; description: string }[] = [
   { value: "fast", label: "Fast", description: "Quick responses, lower cost" },
-  { value: "balanced", label: "Balanced", description: "Speed and quality in balance" },
+  {
+    value: "balanced",
+    label: "Balanced",
+    description: "Speed and quality in balance",
+  },
   { value: "smart", label: "Smart", description: "Best for complex tasks" },
 ];
 
@@ -51,19 +55,36 @@ export function Composer({ onSend, disabled, embedded }: ComposerProps) {
     if (!trimmed || disabled) return;
     onSend(trimmed, model);
     setText("");
+    const ta = textareaRef.current;
+    if (ta) {
+      ta.style.height = "auto";
+      ta.style.overflowY = "hidden";
+    }
     textareaRef.current?.focus();
   };
 
   const hasText = text.trim().length > 0;
   const current = MODELS.find((m) => m.value === model) ?? MODELS[0];
 
+  const MAX_LINES = 10;
+  const LINE_HEIGHT_PX = 20;
+  const MAX_HEIGHT_PX = MAX_LINES * LINE_HEIGHT_PX;
+
+  useEffect(() => {
+    const ta = textareaRef.current;
+    if (!ta) return;
+    ta.style.height = "auto";
+    ta.style.overflowY = "hidden";
+    const h = Math.min(ta.scrollHeight, MAX_HEIGHT_PX);
+    ta.style.height = `${h}px`;
+    ta.style.overflowY = ta.scrollHeight > MAX_HEIGHT_PX ? "auto" : "hidden";
+  }, [text]);
+
   return (
     <form
       onSubmit={handleSubmit}
       className={
-        embedded
-          ? "bg-transparent px-0 py-2"
-          : "bg-transparent px-4 py-4"
+        embedded ? "bg-transparent px-0 py-2" : "bg-transparent px-4 py-4"
       }
     >
       {/* Gemini-style capsule: text area on top, controls bar on bottom */}
@@ -81,8 +102,8 @@ export function Composer({ onSend, disabled, embedded }: ComposerProps) {
               }
             }}
             placeholder="Ask anything"
-            rows={2}
-            className="min-h-[56px] max-h-[200px] w-full resize-none bg-transparent text-sm text-gh-fg placeholder:text-gh-fg-muted focus:outline-none disabled:opacity-50"
+            rows={1}
+            className="min-h-[40px] w-full resize-none overflow-y-auto bg-transparent text-sm leading-5 text-gh-fg placeholder:text-gh-fg-muted focus:outline-none disabled:opacity-50"
             disabled={disabled}
             aria-label="Message"
           />
@@ -100,13 +121,21 @@ export function Composer({ onSend, disabled, embedded }: ComposerProps) {
                 aria-label="Attach or more options"
                 aria-expanded={plusOpen}
               >
-                <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <svg
+                  className="h-5 w-5"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                >
                   <path d="M12 5v14M5 12h14" />
                 </svg>
               </button>
               {plusOpen && (
                 <div className="absolute left-0 bottom-full z-20 mb-1 min-w-[200px] rounded-xl border border-gh-border bg-gh-bg py-2 shadow-lg">
-                  <div className="px-3 py-1.5 text-xs font-medium text-gh-fg-muted">Attach file (coming soon)</div>
+                  <div className="px-3 py-1.5 text-xs font-medium text-gh-fg-muted">
+                    Attach file (coming soon)
+                  </div>
                 </div>
               )}
             </div>
@@ -116,7 +145,13 @@ export function Composer({ onSend, disabled, embedded }: ComposerProps) {
               className="flex h-9 items-center gap-1.5 rounded-lg px-2.5 text-sm text-gh-fg-muted hover:bg-gh-border-muted hover:text-gh-fg disabled:opacity-50"
               aria-label="Tools (coming soon)"
             >
-              <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <svg
+                className="h-4 w-4"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+              >
                 <circle cx="12" cy="12" r="3" />
                 <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" />
               </svg>
@@ -135,7 +170,13 @@ export function Composer({ onSend, disabled, embedded }: ComposerProps) {
                 aria-expanded={modelOpen}
               >
                 {current.label}
-                <svg className={`h-4 w-4 transition-transform ${modelOpen ? "rotate-180" : ""}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <svg
+                  className={`h-4 w-4 transition-transform ${modelOpen ? "rotate-180" : ""}`}
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                >
                   <path d="M6 9l6 6 6-6" />
                 </svg>
               </button>
@@ -157,11 +198,21 @@ export function Composer({ onSend, disabled, embedded }: ComposerProps) {
                       className="flex w-full items-start gap-3 px-4 py-2.5 text-left hover:bg-gh-bg-subtle focus:outline-none"
                     >
                       <div className="min-w-0 flex-1">
-                        <div className="text-sm font-medium text-gh-fg">{m.label}</div>
-                        <div className="mt-0.5 text-xs text-gh-fg-muted">{m.description}</div>
+                        <div className="text-sm font-medium text-gh-fg">
+                          {m.label}
+                        </div>
+                        <div className="mt-0.5 text-xs text-gh-fg-muted">
+                          {m.description}
+                        </div>
                       </div>
                       {model === m.value && (
-                        <svg className="h-5 w-5 shrink-0 text-gh-accent" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <svg
+                          className="h-5 w-5 shrink-0 text-gh-accent"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                        >
                           <path d="M20 6L9 17l-5-5" />
                         </svg>
                       )}
@@ -177,7 +228,15 @@ export function Composer({ onSend, disabled, embedded }: ComposerProps) {
                 className="flex h-9 w-9 items-center justify-center rounded-lg text-gh-fg-muted hover:bg-gh-border-muted hover:text-gh-fg focus:outline-none focus:ring-2 focus:ring-gh-accent focus:ring-offset-1 focus:ring-offset-gh-bg-subtle disabled:opacity-50"
                 aria-label="Send message"
               >
-                <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <svg
+                  className="h-5 w-5"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
                   <path d="M22 2L11 13" />
                   <path d="M22 2L15 22L11 13L2 9L22 2Z" />
                 </svg>
@@ -189,7 +248,13 @@ export function Composer({ onSend, disabled, embedded }: ComposerProps) {
                 className="flex h-9 w-9 items-center justify-center rounded-lg text-gh-fg-muted disabled:opacity-50"
                 aria-label="Voice input (coming soon)"
               >
-                <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <svg
+                  className="h-5 w-5"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                >
                   <path d="M12 2a3 3 0 0 1 3 3v7a3 3 0 0 1-6 0V5a3 3 0 0 1 3-3z" />
                   <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
                   <line x1="12" y1="19" x2="12" y2="22" />
