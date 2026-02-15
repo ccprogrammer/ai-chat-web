@@ -1,0 +1,65 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* GitHub-like theme variables (light) */
+:root {
+  --gh-bg: #ffffff;
+  --gh-bg-subtle: #f6f8fa;
+  --gh-border: #d0d7de;
+  --gh-border-muted: #d8dee4;
+  --gh-fg: #1f2328;
+  --gh-fg-muted: #656d76;
+  --gh-accent: #0969da;
+  --gh-accent-fg: #ffffff;
+  --gh-success: #1a7f37;
+  --gh-danger: #cf222e;
+  --gh-input-bg: #ffffff;
+  --gh-shadow: rgba(31, 35, 40, 0.12);
+}
+
+/* GitHub-like dark theme */
+.dark {
+  --gh-bg: #0d1117;
+  --gh-bg-subtle: #161b22;
+  --gh-border: #30363d;
+  --gh-border-muted: #21262d;
+  --gh-fg: #e6edf3;
+  --gh-fg-muted: #8b949e;
+  --gh-accent: #58a6ff;
+  --gh-accent-fg: #ffffff;
+  --gh-success: #3fb950;
+  --gh-danger: #f85149;
+  --gh-input-bg: #0d1117;
+  --gh-shadow: rgba(0, 0, 0, 0.3);
+}
+
+@layer base {
+  html {
+    @apply antialiased;
+  }
+  body {
+    @apply bg-gh-bg text-gh-fg font-sans;
+  }
+}
+
+/* GitHub-style buttons and inputs */
+.gh-btn {
+  @apply inline-flex items-center justify-center gap-2 rounded-lg border border-gh-border bg-gh-bg-subtle px-4 py-2 text-sm font-medium text-gh-fg shadow-sm transition-colors hover:bg-gh-border-muted hover:border-gh-fg-muted;
+}
+
+.gh-btn-primary {
+  @apply border-transparent bg-gh-accent text-gh-accent-fg hover:opacity-90;
+}
+
+.gh-input {
+  @apply w-full rounded-lg border border-gh-border bg-gh-input-bg px-3 py-2 text-gh-fg placeholder:text-gh-fg-muted focus:border-gh-accent focus:outline-none focus:ring-1 focus:ring-gh-accent;
+}
+
+.gh-card {
+  @apply rounded-xl border border-gh-border bg-gh-bg shadow-sm;
+}
+
+.gh-link {
+  @apply text-gh-accent hover:underline;
+}
