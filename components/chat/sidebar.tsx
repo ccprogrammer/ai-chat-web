@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useRef, useState, useEffect } from "react";
+import { useSidebar } from "@/lib/sidebar-context";
 import type { Chat } from "@/types";
 
 interface SidebarProps {
@@ -24,6 +25,7 @@ function formatDate(iso: string) {
 
 export function Sidebar({ chats, onCreateChat, onRenameChat, onDeleteChat, isLoading }: SidebarProps) {
   const pathname = usePathname();
+  const { collapsed } = useSidebar();
   const [menuOpenId, setMenuOpenId] = useState<string | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editingTitle, setEditingTitle] = useState("");
@@ -71,8 +73,12 @@ export function Sidebar({ chats, onCreateChat, onRenameChat, onDeleteChat, isLoa
     }
   };
 
+  if (collapsed) {
+    return null;
+  }
+
   return (
-    <aside className="flex w-64 shrink-0 flex-col border-r border-gh-border bg-gh-bg-subtle">
+    <aside className="flex w-64 shrink-0 flex-col border-r border-gh-border bg-gh-bg-subtle transition-[width] duration-200">
       <div className="flex items-center justify-between border-b border-gh-border p-3">
         <span className="text-sm font-medium text-gh-fg">Chats</span>
         <button
