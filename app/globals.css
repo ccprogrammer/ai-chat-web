@@ -63,3 +63,37 @@
 .gh-link {
   @apply text-gh-accent hover:underline;
 }
+
+/* Thin, minimal scrollbar (light) */
+:root {
+  --scrollbar-track: transparent;
+  --scrollbar-thumb: rgba(31, 35, 40, 0.25);
+  --scrollbar-thumb-hover: rgba(31, 35, 40, 0.4);
+}
+.dark {
+  --scrollbar-track: transparent;
+  --scrollbar-thumb: rgba(255, 255, 255, 0.15);
+  --scrollbar-thumb-hover: rgba(255, 255, 255, 0.25);
+}
+
+/* Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
+}
+
+/* Webkit (Chrome, Safari, Edge) */
+*::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+*::-webkit-scrollbar-track {
+  background: var(--scrollbar-track);
+}
+*::-webkit-scrollbar-thumb {
+  background: var(--scrollbar-thumb);
+  border-radius: 3px;
+}
+*::-webkit-scrollbar-thumb:hover {
+  background: var(--scrollbar-thumb-hover);
+}

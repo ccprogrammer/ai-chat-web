@@ -10,7 +10,7 @@ interface SidebarProps {
   chats: Chat[];
   onCreateChat: () => void;
   onRenameChat?: (id: string, newTitle: string) => void | Promise<void>;
-  onDeleteChat?: (id: string) => void;
+  onDeleteChat?: (id: string) => void | Promise<void>;
   isLoading?: boolean;
 }
 
@@ -66,10 +66,10 @@ export function Sidebar({ chats, onCreateChat, onRenameChat, onDeleteChat, isLoa
     setEditingId(null);
   };
 
-  const handleDeleteClick = (chatId: string) => {
+  const handleDeleteClick = async (chatId: string) => {
     setMenuOpenId(null);
     if (onDeleteChat && (typeof window === "undefined" || window.confirm("Delete this chat?"))) {
-      onDeleteChat(chatId);
+      await onDeleteChat(chatId);
     }
   };
 

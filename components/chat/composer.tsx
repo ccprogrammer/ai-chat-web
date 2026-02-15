@@ -12,9 +12,11 @@ const MODELS: { value: AIModel; label: string; description: string }[] = [
 interface ComposerProps {
   onSend: (message: string, model: AIModel) => void;
   disabled?: boolean;
+  /** When true, no top border or background (for centering below greeting) */
+  embedded?: boolean;
 }
 
-export function Composer({ onSend, disabled }: ComposerProps) {
+export function Composer({ onSend, disabled, embedded }: ComposerProps) {
   const [text, setText] = useState("");
   const [model, setModel] = useState<AIModel>("fast");
   const [modelOpen, setModelOpen] = useState(false);
@@ -52,12 +54,20 @@ export function Composer({ onSend, disabled }: ComposerProps) {
     textareaRef.current?.focus();
   };
 
+  const hasText = text.trim().length > 0;
   const current = MODELS.find((m) => m.value === model) ?? MODELS[0];
 
   return (
-    <form onSubmit={handleSubmit} className="border-t border-gh-border bg-gh-bg px-4 py-4">
+    <form
+      onSubmit={handleSubmit}
+      className={
+        embedded
+          ? "bg-transparent px-0 py-2"
+          : "bg-transparent px-4 py-4"
+      }
+    >
       {/* Gemini-style capsule: text area on top, controls bar on bottom */}
-      <div className="mx-auto max-w-3xl rounded-3xl border border-gh-border bg-gh-bg-subtle shadow-sm focus-within:border-gh-accent/40 focus-within:ring-1 focus-within:ring-gh-accent/20">
+      <div className="mx-auto max-w-3xl rounded-3xl border border-gh-border bg-gh-bg-subtle shadow-[0_-4px_12px_-2px_var(--gh-shadow),0_4px_24px_-8px_var(--gh-shadow)] focus-within:border-gh-accent/40 focus-within:ring-1 focus-within:ring-gh-accent/20">
         {/* Top: text input only */}
         <div className="px-4 pt-4">
           <textarea
@@ -160,18 +170,32 @@ export function Composer({ onSend, disabled }: ComposerProps) {
                 </div>
               )}
             </div>
-            <button
-              type="button"
-              disabled
-              className="flex h-9 w-9 items-center justify-center rounded-lg text-gh-fg-muted hover:bg-gh-border-muted hover:text-gh-fg disabled:opacity-50"
-              aria-label="Voice input (coming soon)"
-            >
-              <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M12 2a3 3 0 0 1 3 3v7a3 3 0 0 1-6 0V5a3 3 0 0 1 3-3z" />
-                <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
-                <line x1="12" y1="19" x2="12" y2="22" />
-              </svg>
-            </button>
+            {hasText ? (
+              <button
+                type="submit"
+                disabled={disabled}
+                className="flex h-9 w-9 items-center justify-center rounded-lg text-gh-fg-muted hover:bg-gh-border-muted hover:text-gh-fg focus:outline-none focus:ring-2 focus:ring-gh-accent focus:ring-offset-1 focus:ring-offset-gh-bg-subtle disabled:opacity-50"
+                aria-label="Send message"
+              >
+                <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M22 2L11 13" />
+                  <path d="M22 2L15 22L11 13L2 9L22 2Z" />
+                </svg>
+              </button>
+            ) : (
+              <button
+                type="button"
+                disabled
+                className="flex h-9 w-9 items-center justify-center rounded-lg text-gh-fg-muted disabled:opacity-50"
+                aria-label="Voice input (coming soon)"
+              >
+                <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M12 2a3 3 0 0 1 3 3v7a3 3 0 0 1-6 0V5a3 3 0 0 1 3-3z" />
+                  <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
+                  <line x1="12" y1="19" x2="12" y2="22" />
+                </svg>
+              </button>
+            )}
           </div>
         </div>
       </div>

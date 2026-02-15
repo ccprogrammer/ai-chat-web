@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useAuth } from "@/lib/auth-context";
 import { chatsApi } from "@/lib/api";
 import { Sidebar } from "@/components/chat/sidebar";
@@ -13,7 +13,7 @@ export default function ChatIndexPage() {
   const [chats, setChats] = useState<Chat[]>([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
+  const loadChats = useCallback(() => {
     if (!token) return;
     chatsApi
       .list(token)
@@ -22,8 +22,16 @@ export default function ChatIndexPage() {
       .finally(() => setLoading(false));
   }, [token]);
 
+  useEffect(() => {
+    loadChats();
+  }, [loadChats]);
+
   const handleCreateChat = async () => {
     if (!token) return;
+    const hasEmptyNewChat = chats.some(
+      (c) => c.message_count === 0 && (!c.title || c.title.trim() === "" || c.title.trim().toLowerCase() === "new chat")
+    );
+    if (hasEmptyNewChat) return;
     setLoading(true);
     try {
       const chat = await chatsApi.create(token);
@@ -50,7 +58,7 @@ export default function ChatIndexPage() {
     if (!token) return;
     try {
       await chatsApi.delete(token, id);
-      setChats((prev) => prev.filter((c) => c.id !== id));
+      setChats((prev) => prev.filter((c) => String(c.id) !== String(id)));
       if (typeof window !== "undefined" && window.location.pathname === `/chat/${id}`) {
         router.replace("/chat");
       }

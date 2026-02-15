@@ -73,6 +73,7 @@ export const chatsApi = {
   list: (token: string) =>
     request<{ chats: import("@/types").Chat[]; total: number }>("/chats", {
       token,
+      cache: "no-store",
     }),
 
   create: (token: string, title?: string) =>

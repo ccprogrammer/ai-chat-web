@@ -46,6 +46,10 @@ export default function ChatThreadPage() {
 
   const handleCreateChat = async () => {
     if (!token) return;
+    const hasEmptyNewChat = chats.some(
+      (c) => c.message_count === 0 && (!c.title || c.title.trim() === "" || c.title.trim().toLowerCase() === "new chat")
+    );
+    if (hasEmptyNewChat) return;
     setLoadingChats(true);
     try {
       const chat = await chatsApi.create(token);
@@ -70,7 +74,7 @@ export default function ChatThreadPage() {
     if (!token) return;
     try {
       await chatsApi.delete(token, chatId);
-      setChats((prev) => prev.filter((c) => c.id !== chatId));
+      setChats((prev) => prev.filter((c) => String(c.id) !== String(chatId)));
       if (chatId === id) router.replace("/chat");
     } catch {
       // ignore
@@ -108,6 +112,8 @@ export default function ChatThreadPage() {
     }
   };
 
+  const isEmpty = messages.length === 0 && !loadingMessages;
+
   return (
     <>
       <Sidebar
@@ -118,15 +124,46 @@ export default function ChatThreadPage() {
         isLoading={loadingChats}
       />
       <div className="flex flex-1 flex-col overflow-hidden">
-        <MessageList
-          messages={messages}
-          isLoading={loadingMessages && messages.length === 0}
-          isThinking={sending}
-        />
-        {!loadingMessages && (
-          <Composer onSend={handleSend} disabled={sending} />
+        {isEmpty ? (
+          <div className="flex flex-1 flex-col items-center justify-center px-4 py-12">
+            <div className="flex w-full max-w-2xl flex-col items-center gap-8">
+              <div className="flex flex-col items-center gap-4 text-center">
+                <SparkleIcon className="h-14 w-14 text-gh-accent" />
+                <div>
+                  <h2 className="text-xl font-semibold text-gh-fg">Hi there</h2>
+                  <p className="mt-2 text-2xl font-medium text-gh-fg sm:text-3xl">Where should we start?</p>
+                </div>
+              </div>
+              <div className="w-full max-w-3xl">
+                <Composer onSend={handleSend} disabled={sending} embedded />
+              </div>
+            </div>
+          </div>
+        ) : (
+          <div className="flex min-h-0 flex-1 flex-col overflow-y-auto">
+            <MessageList
+              messages={messages}
+              isLoading={loadingMessages && messages.length === 0}
+              isThinking={sending}
+            />
+            {!loadingMessages && (
+              <div className="sticky bottom-0 flex-shrink-0 bg-transparent pt-2">
+                <Composer onSend={handleSend} disabled={sending} />
+              </div>
+            )}
+          </div>
         )}
       </div>
     </>
+  );
+}
+
+function SparkleIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+      <path d="M12 2l1.5 4.5L18 8l-4.5 1.5L12 14l-1.5-4.5L6 8l4.5-1.5L12 2z" />
+      <path d="M19 14l.8 2.4 2.4.8-2.4.8-.8 2.4-.8-2.4-2.4-.8 2.4-.8.8-2.4z" opacity={0.85} />
+      <path d="M5 19l.6 1.8 1.8.6-1.8.6-.6 1.8-.6-1.8-1.8-.6 1.8-.6.6-1.8z" opacity={0.7} />
+    </svg>
   );
 }
