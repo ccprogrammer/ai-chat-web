@@ -1,6 +1,5 @@
 "use client";
 
-import { useRef, useEffect } from "react";
 import type { Message } from "@/types";
 
 interface MessageListProps {
@@ -14,35 +13,15 @@ function formatTime(iso: string) {
 }
 
 export function MessageList({ messages, isLoading, isThinking }: MessageListProps) {
-  const lastUserMessageRef = useRef<HTMLLIElement>(null);
-
-  const lastUserIndex = (() => {
-    let idx = -1;
-    for (let i = messages.length - 1; i >= 0; i--) {
-      if (messages[i].role === "user") {
-        idx = i;
-        break;
-      }
-    }
-    return idx;
-  })();
-
-  useEffect(() => {
-    if (messages.length > 0 && lastUserIndex >= 0) {
-      lastUserMessageRef.current?.scrollIntoView({ block: "start", behavior: "smooth" });
-    }
-  }, [messages.length, lastUserIndex]);
-
   if (messages.length === 0 && !isLoading) {
     return null;
   }
 
   return (
     <ul className="flex flex-col gap-4 p-3 sm:p-4">
-      {messages.map((msg, index) => (
+      {messages.map((msg) => (
         <li
           key={msg.id}
-          ref={index === lastUserIndex ? lastUserMessageRef : undefined}
           className={`flex gap-2 sm:gap-3 ${msg.role === "user" ? "justify-end" : "justify-start"}`}
         >
           <div

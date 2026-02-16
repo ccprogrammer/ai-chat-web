@@ -1,7 +1,7 @@
 "use client";
 
 import { useParams, useRouter } from "next/navigation";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useAuth } from "@/lib/auth-context";
 import { chatsApi, sendMessage } from "@/lib/api";
 import { DashboardNavbar } from "@/components/dashboard-navbar";
@@ -20,6 +20,13 @@ export default function ChatThreadPage() {
   const [loadingChats, setLoadingChats] = useState(true);
   const [loadingMessages, setLoadingMessages] = useState(true);
   const [sending, setSending] = useState(false);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+
+  useLayoutEffect(() => {
+    const el = scrollContainerRef.current;
+    if (!el) return;
+    el.scrollTop = el.scrollHeight - el.clientHeight;
+  }, [messages.length, loadingMessages, sending]);
 
   const loadChats = useCallback(() => {
     if (!token) return;
@@ -143,7 +150,7 @@ export default function ChatThreadPage() {
             </div>
           </div>
         ) : (
-          <div className="flex min-h-0 flex-1 flex-col overflow-y-auto">
+          <div ref={scrollContainerRef} className="flex min-h-0 flex-1 flex-col overflow-y-auto">
             <MessageList
               messages={messages}
               isLoading={loadingMessages && messages.length === 0}
