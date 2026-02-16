@@ -56,7 +56,7 @@ export default function AdminUserChatsPage() {
                 href="/chat"
                 className="mb-4 inline-flex items-center gap-1 text-sm text-gh-accent hover:underline"
               >
-                ← Back to my chats
+                ← Back
               </Link>
               <h1 className="mb-4 text-lg font-semibold text-gh-fg">
                 User&apos;s chats
@@ -70,7 +70,7 @@ export default function AdminUserChatsPage() {
                   {userChats.map((chat) => (
                     <li key={chat.id}>
                       <Link
-                        href={`/admin/chats/${chat.id}`}
+                        href={`/admin/users/${userId}/chats/${chat.id}`}
                         className="block rounded-lg border border-gh-border bg-gh-bg-subtle px-4 py-3 text-gh-fg hover:border-gh-border-muted"
                       >
                         <span className="block font-medium">

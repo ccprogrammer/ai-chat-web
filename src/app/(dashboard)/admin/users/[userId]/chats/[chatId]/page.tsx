@@ -10,8 +10,9 @@ import {
 } from "@/features/chat";
 import { useAdminChatMessages } from "@/features/admin";
 
-export default function AdminChatMessagesPage() {
+export default function AdminUserChatMessagesPage() {
   const params = useParams();
+  const userId = params.userId as string;
   const chatId = params.chatId as string;
 
   const {
@@ -43,10 +44,10 @@ export default function AdminChatMessagesPage() {
           <div className="flex flex-1 flex-col overflow-y-auto">
             <div className="p-4">
               <Link
-                href="/chat"
+                href={`/admin/users/${userId}`}
                 className="mb-4 inline-flex items-center gap-1 text-sm text-gh-accent hover:underline"
               >
-                ← Back to my chats
+                ← Back
               </Link>
             </div>
             <MessageList
