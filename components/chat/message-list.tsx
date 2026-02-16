@@ -46,10 +46,10 @@ export function MessageList({ messages, isLoading, isThinking }: MessageListProp
           className={`flex gap-2 sm:gap-3 ${msg.role === "user" ? "justify-end" : "justify-start"}`}
         >
           <div
-            className={`max-w-[90%] sm:max-w-[85%] rounded-2xl border px-3 py-2.5 sm:px-4 sm:py-3 ${
+            className={`max-w-[90%] sm:max-w-[85%] px-3 py-2.5 sm:px-4 sm:py-3 ${
               msg.role === "user"
-                ? "border-gh-accent bg-gh-accent/10 text-gh-fg"
-                : "border-gh-border bg-gh-bg-subtle text-gh-fg"
+                ? "rounded-2xl border border-gh-border bg-gh-bg-subtle text-gh-fg"
+                : "text-gh-fg"
             }`}
           >
             <div className="mb-1 text-xs font-medium text-gh-fg-muted">
@@ -61,7 +61,7 @@ export function MessageList({ messages, isLoading, isThinking }: MessageListProp
       ))}
       {(isLoading || isThinking) && (
         <li className="flex justify-start">
-          <div className="rounded-2xl border border-gh-border bg-gh-bg-subtle px-3 py-2.5 sm:px-4 sm:py-3">
+          <div className="px-3 py-2.5 sm:px-4 sm:py-3">
             <span className="text-gh-fg-muted">Thinking…</span>
           </div>
         </li>
