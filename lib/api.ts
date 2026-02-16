@@ -47,6 +47,11 @@ async function request<T>(
   console.log("[API] Response:", res.status, path, body);
 
   if (!res.ok) {
+    if (res.status === 401 && typeof window !== "undefined") {
+      localStorage.removeItem("ai_chat_token");
+      localStorage.removeItem("ai_chat_email");
+      window.location.href = "/login";
+    }
     const msg =
       typeof body === "object" && body !== null && "detail" in body
         ? String((body as { detail: unknown }).detail)
