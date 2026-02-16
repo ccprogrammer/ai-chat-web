@@ -2,15 +2,28 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useRef, useState, useEffect } from "react";
 import { useAuth } from "@/lib/auth-context";
 import { useTheme } from "@/components/theme-provider";
 import { useSidebar } from "@/lib/sidebar-context";
 
 export function DashboardNavbar() {
-  const { logout } = useAuth();
+  const { logout, email } = useAuth();
   const router = useRouter();
   const { theme, toggleTheme } = useTheme();
   const { toggle } = useSidebar();
+  const [menuOpen, setMenuOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!menuOpen) return;
+    const close = (e: MouseEvent) => {
+      if (menuRef.current?.contains(e.target as Node)) return;
+      setMenuOpen(false);
+    };
+    document.addEventListener("click", close);
+    return () => document.removeEventListener("click", close);
+  }, [menuOpen]);
 
   return (
     <header className="flex h-14 shrink-0 items-center justify-between gap-2 bg-gh-bg px-3 sm:px-4">
@@ -49,9 +62,46 @@ export function DashboardNavbar() {
             </svg>
           )}
         </button>
-        <button type="button" onClick={() => { logout(); router.replace("/"); }} className="gh-btn text-sm">
-          Sign out
-        </button>
+        <div className="relative" ref={menuRef}>
+          <button
+            type="button"
+            onClick={() => setMenuOpen((o) => !o)}
+            className="rounded p-2 text-gh-fg-muted hover:bg-gh-bg-subtle hover:text-gh-fg"
+            aria-label="Account menu"
+            aria-expanded={menuOpen}
+            aria-haspopup="true"
+          >
+            <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+              <circle cx="12" cy="7" r="4" />
+            </svg>
+          </button>
+          {menuOpen && (
+            <div
+              className="absolute right-0 top-full z-20 mt-1 min-w-[200px] rounded-lg border border-gh-border bg-gh-bg py-2 shadow-lg"
+              role="menu"
+            >
+              <div className="px-3 py-2">
+                <p className="text-xs font-medium text-gh-fg-muted">Email</p>
+                <p className="truncate text-sm text-gh-fg" title={email ?? undefined}>
+                  {email ?? "—"}
+                </p>
+              </div>
+              <button
+                type="button"
+                role="menuitem"
+                onClick={() => {
+                  setMenuOpen(false);
+                  logout();
+                  router.replace("/");
+                }}
+                className="w-full px-3 py-2 text-left text-sm text-gh-danger hover:bg-gh-bg-subtle"
+              >
+                Sign out
+              </button>
+            </div>
+          )}
+        </div>
       </div>
     </header>
   );
