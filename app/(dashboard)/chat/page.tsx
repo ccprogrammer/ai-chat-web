@@ -41,6 +41,7 @@ export default function ChatIndexPage() {
 
   const handleCreateChat = async () => {
     if (!token) return;
+    if (chats.length === 0) return;
     const emptyNewChat = chats.find(
       (c) => c.message_count === 0 && (!c.title || c.title.trim() === "" || c.title.trim().toLowerCase() === "new chat")
     );
@@ -108,6 +109,7 @@ export default function ChatIndexPage() {
         onDeleteChat={handleDeleteChat}
         canDeleteChat={() => true}
         isLoading={loading}
+        createChatDisabled={chats.length === 0}
       />
       <div className="flex flex-1 flex-col overflow-hidden">
         <div className="flex flex-1 flex-col items-center justify-center px-4 py-12">

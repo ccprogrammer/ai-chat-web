@@ -14,6 +14,8 @@ interface SidebarProps {
   /** When false for a chat, Delete is hidden (e.g. last empty chat). Default: true */
   canDeleteChat?: (chat: Chat) => boolean;
   isLoading?: boolean;
+  /** When true, New chat button is disabled (e.g. when no chats yet—user must send a message to create one). */
+  createChatDisabled?: boolean;
 }
 
 function formatDate(iso: string) {
@@ -25,7 +27,7 @@ function formatDate(iso: string) {
   return d.toLocaleDateString([], { month: "short", day: "numeric" });
 }
 
-export function Sidebar({ chats, onCreateChat, onRenameChat, onDeleteChat, canDeleteChat, isLoading }: SidebarProps) {
+export function Sidebar({ chats, onCreateChat, onRenameChat, onDeleteChat, canDeleteChat, isLoading, createChatDisabled }: SidebarProps) {
   const pathname = usePathname();
   const { collapsed } = useSidebar();
   const [menuOpenId, setMenuOpenId] = useState<string | null>(null);
@@ -86,7 +88,7 @@ export function Sidebar({ chats, onCreateChat, onRenameChat, onDeleteChat, canDe
         <button
           type="button"
           onClick={onCreateChat}
-          disabled={isLoading}
+          disabled={isLoading || createChatDisabled}
           className="gh-btn text-xs"
         >
           New chat
