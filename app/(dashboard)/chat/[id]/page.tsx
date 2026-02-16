@@ -72,12 +72,13 @@ export default function ChatThreadPage() {
 
   const handleDeleteChat = async (chatId: string) => {
     if (!token) return;
+    const removed = chats.find((c) => String(c.id) === String(chatId));
+    setChats((prev) => prev.filter((c) => String(c.id) !== String(chatId)));
+    if (chatId === id) router.replace("/chat");
     try {
       await chatsApi.delete(token, chatId);
-      setChats((prev) => prev.filter((c) => String(c.id) !== String(chatId)));
-      if (chatId === id) router.replace("/chat");
     } catch {
-      // ignore
+      if (removed) setChats((prev) => [removed, ...prev]);
     }
   };
 
@@ -121,6 +122,7 @@ export default function ChatThreadPage() {
         onCreateChat={handleCreateChat}
         onRenameChat={handleRenameChat}
         onDeleteChat={handleDeleteChat}
+        canDeleteChat={() => true}
         isLoading={loadingChats}
       />
       <div className="flex flex-1 flex-col overflow-hidden">

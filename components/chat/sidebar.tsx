@@ -11,6 +11,8 @@ interface SidebarProps {
   onCreateChat: () => void;
   onRenameChat?: (id: string, newTitle: string) => void | Promise<void>;
   onDeleteChat?: (id: string) => void | Promise<void>;
+  /** When false for a chat, Delete is hidden (e.g. last empty chat). Default: true */
+  canDeleteChat?: (chat: Chat) => boolean;
   isLoading?: boolean;
 }
 
@@ -23,7 +25,7 @@ function formatDate(iso: string) {
   return d.toLocaleDateString([], { month: "short", day: "numeric" });
 }
 
-export function Sidebar({ chats, onCreateChat, onRenameChat, onDeleteChat, isLoading }: SidebarProps) {
+export function Sidebar({ chats, onCreateChat, onRenameChat, onDeleteChat, canDeleteChat, isLoading }: SidebarProps) {
   const pathname = usePathname();
   const { collapsed } = useSidebar();
   const [menuOpenId, setMenuOpenId] = useState<string | null>(null);
@@ -180,7 +182,7 @@ export function Sidebar({ chats, onCreateChat, onRenameChat, onDeleteChat, isLoa
                           Rename
                         </button>
                       )}
-                      {onDeleteChat && (
+                      {onDeleteChat && canDeleteChat?.(chat) !== false && (
                         <button
                           type="button"
                           role="menuitem"
