@@ -3,7 +3,8 @@
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import { useAuth } from "@/lib/auth-context";
-import { chatsApi, sendMessage } from "@/lib/api";
+import { useToast } from "@/lib/toast-context";
+import { ApiError, chatsApi, sendMessage } from "@/lib/api";
 import { DashboardNavbar } from "@/components/dashboard-navbar";
 import { Sidebar } from "@/components/chat/sidebar";
 import { Composer } from "@/components/chat/composer";
@@ -22,6 +23,7 @@ function SparkleIcon({ className }: { className?: string }) {
 export default function ChatIndexPage() {
   const { token } = useAuth();
   const router = useRouter();
+  const { showError } = useToast();
   const [chats, setChats] = useState<Chat[]>([]);
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
@@ -31,9 +33,12 @@ export default function ChatIndexPage() {
     chatsApi
       .list(token)
       .then((res) => setChats(res.chats))
-      .catch(() => setChats([]))
+      .catch((err) => {
+        setChats([]);
+        showError(err instanceof ApiError ? err.message : "Failed to load chats");
+      })
       .finally(() => setLoading(false));
-  }, [token]);
+  }, [token, showError]);
 
   useEffect(() => {
     loadChats();
@@ -54,8 +59,8 @@ export default function ChatIndexPage() {
       const chat = await chatsApi.create(token);
       setChats((prev) => [chat, ...prev]);
       router.push(`/chat/${chat.id}`);
-    } catch {
-      setLoading(false);
+    } catch (err) {
+      showError(err instanceof ApiError ? err.message : "Failed to create chat");
     } finally {
       setLoading(false);
     }
@@ -69,8 +74,8 @@ export default function ChatIndexPage() {
       setChats((prev) => [chat, ...prev]);
       await sendMessage(token, { chat_id: chat.id, message });
       router.push(`/chat/${chat.id}`);
-    } catch {
-      setSending(false);
+    } catch (err) {
+      showError(err instanceof ApiError ? err.message : "Something went wrong");
     } finally {
       setSending(false);
     }
@@ -81,18 +86,20 @@ export default function ChatIndexPage() {
     try {
       const updated = await chatsApi.update(token, chatId, newTitle);
       setChats((prev) => prev.map((c) => (c.id === chatId ? updated : c)));
-    } catch {
-      // ignore
+    } catch (err) {
+      showError(err instanceof ApiError ? err.message : "Failed to rename chat");
     }
   };
 
   const handleDeleteChat = async (id: string) => {
     if (!token) return;
+    const deleted = chats.find((c) => String(c.id) === String(id));
     setChats((prev) => prev.filter((c) => String(c.id) !== String(id)));
     try {
       await chatsApi.delete(token, id);
-    } catch {
-      // ignore – UI already updated
+    } catch (err) {
+      if (deleted) setChats((prev) => [deleted, ...prev]);
+      showError(err instanceof ApiError ? err.message : "Failed to delete chat");
     }
     if (typeof window !== "undefined" && window.location.pathname === `/chat/${id}`) {
       router.replace("/chat");

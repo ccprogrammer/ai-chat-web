@@ -3,7 +3,8 @@
 import { useParams, useRouter } from "next/navigation";
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useAuth } from "@/lib/auth-context";
-import { chatsApi, sendMessage } from "@/lib/api";
+import { useToast } from "@/lib/toast-context";
+import { ApiError, chatsApi, sendMessage } from "@/lib/api";
 import { DashboardNavbar } from "@/components/dashboard-navbar";
 import { Sidebar } from "@/components/chat/sidebar";
 import { MessageList } from "@/components/chat/message-list";
@@ -15,6 +16,7 @@ export default function ChatThreadPage() {
   const id = params.id as string;
   const { token } = useAuth();
   const router = useRouter();
+  const { showError } = useToast();
   const [chats, setChats] = useState<Chat[]>([]);
   const [messages, setMessages] = useState<Message[]>([]);
   const [loadingChats, setLoadingChats] = useState(true);
@@ -33,9 +35,12 @@ export default function ChatThreadPage() {
     chatsApi
       .list(token)
       .then((res) => setChats(res.chats))
-      .catch(() => setChats([]))
+      .catch((err) => {
+        setChats([]);
+        showError(err instanceof ApiError ? err.message : "Failed to load chats");
+      })
       .finally(() => setLoadingChats(false));
-  }, [token]);
+  }, [token, showError]);
 
   useEffect(() => {
     loadChats();
@@ -47,9 +52,12 @@ export default function ChatThreadPage() {
     chatsApi
       .getMessages(token, id)
       .then(setMessages)
-      .catch(() => setMessages([]))
+      .catch((err) => {
+        setMessages([]);
+        showError(err instanceof ApiError ? err.message : "Failed to load messages");
+      })
       .finally(() => setLoadingMessages(false));
-  }, [token, id]);
+  }, [token, id, showError]);
 
   const handleCreateChat = async () => {
     if (!token) return;
@@ -62,6 +70,8 @@ export default function ChatThreadPage() {
       const chat = await chatsApi.create(token);
       setChats((prev) => [chat, ...prev]);
       router.push(`/chat/${chat.id}`);
+    } catch (err) {
+      showError(err instanceof ApiError ? err.message : "Failed to create chat");
     } finally {
       setLoadingChats(false);
     }
@@ -72,18 +82,20 @@ export default function ChatThreadPage() {
     try {
       const updated = await chatsApi.update(token, chatId, newTitle);
       setChats((prev) => prev.map((c) => (c.id === chatId ? updated : c)));
-    } catch {
-      // ignore
+    } catch (err) {
+      showError(err instanceof ApiError ? err.message : "Failed to rename chat");
     }
   };
 
   const handleDeleteChat = async (chatId: string) => {
     if (!token) return;
+    const deleted = chats.find((c) => String(c.id) === String(chatId));
     setChats((prev) => prev.filter((c) => String(c.id) !== String(chatId)));
     try {
       await chatsApi.delete(token, chatId);
-    } catch {
-      // ignore – UI already updated
+    } catch (err) {
+      if (deleted) setChats((prev) => [deleted, ...prev]);
+      showError(err instanceof ApiError ? err.message : "Failed to delete chat");
     }
     if (chatId === id) router.replace("/chat");
   };
@@ -112,8 +124,9 @@ export default function ChatThreadPage() {
         },
       ]);
       loadChats();
-    } catch {
+    } catch (err) {
       setMessages((prev) => prev.filter((m) => m.id !== -1));
+      showError(err instanceof ApiError ? err.message : "Failed to send message");
     } finally {
       setSending(false);
     }
