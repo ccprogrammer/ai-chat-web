@@ -86,7 +86,9 @@ export function Sidebar({ chats, onCreateChat, onRenameChat, onDeleteChat, canDe
   };
 
   return (
-    <>
+    <div
+      className={`flex h-full w-0 shrink-0 flex-col overflow-hidden transition-[width] duration-300 ease-in-out ${collapsed ? "md:w-0" : "md:w-64"}`}
+    >
       {/* Mobile: backdrop when sidebar open */}
       <div
         className={`fixed inset-0 z-40 bg-black/50 transition-opacity duration-300 md:hidden ${
@@ -95,13 +97,13 @@ export function Sidebar({ chats, onCreateChat, onRenameChat, onDeleteChat, canDe
         onClick={() => !collapsed && close()}
         aria-hidden="true"
       />
-      {/* Sidebar: overlay on mobile, inline on desktop */}
+      {/* Sidebar: overlay on mobile, full-height column on desktop */}
       <aside
         className={`
-          fixed left-0 top-0 z-50 flex h-full w-64 shrink-0 flex-col overflow-hidden border-r border-gh-border bg-gh-bg-subtle
+          fixed left-0 top-0 z-50 flex h-full w-64 flex-col overflow-hidden border-r border-gh-border bg-gh-bg-subtle
           transition-[transform,width] duration-300 ease-in-out
-          md:relative md:top-auto md:z-auto md:h-auto md:shrink-0
-          ${collapsed ? "-translate-x-full md:translate-x-0 md:w-0" : "translate-x-0 md:w-64"}
+          md:relative md:left-auto md:top-auto md:z-auto md:h-full md:w-64
+          ${collapsed ? "-translate-x-full md:translate-x-0 md:w-0" : "translate-x-0"}
         `}
       >
       <div className="flex items-center justify-between border-b border-gh-border p-2.5 sm:p-3">
@@ -225,6 +227,6 @@ export function Sidebar({ chats, onCreateChat, onRenameChat, onDeleteChat, canDe
         </ul>
       </nav>
     </aside>
-    </>
+    </div>
   );
 }
