@@ -72,14 +72,13 @@ export default function ChatThreadPage() {
 
   const handleDeleteChat = async (chatId: string) => {
     if (!token) return;
-    const removed = chats.find((c) => String(c.id) === String(chatId));
     setChats((prev) => prev.filter((c) => String(c.id) !== String(chatId)));
-    if (chatId === id) router.replace("/chat");
     try {
       await chatsApi.delete(token, chatId);
     } catch {
-      if (removed) setChats((prev) => [removed, ...prev]);
+      // ignore – UI already updated
     }
+    if (chatId === id) router.replace("/chat");
   };
 
   const handleSend = async (message: string, model: AIModel) => {

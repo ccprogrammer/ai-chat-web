@@ -88,15 +88,14 @@ export default function ChatIndexPage() {
 
   const handleDeleteChat = async (id: string) => {
     if (!token) return;
-    const removed = chats.find((c) => String(c.id) === String(id));
     setChats((prev) => prev.filter((c) => String(c.id) !== String(id)));
-    if (typeof window !== "undefined" && window.location.pathname === `/chat/${id}`) {
-      router.replace("/chat");
-    }
     try {
       await chatsApi.delete(token, id);
     } catch {
-      if (removed) setChats((prev) => [removed, ...prev]);
+      // ignore – UI already updated
+    }
+    if (typeof window !== "undefined" && window.location.pathname === `/chat/${id}`) {
+      router.replace("/chat");
     }
   };
 
