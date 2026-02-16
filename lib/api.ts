@@ -23,12 +23,14 @@ async function request<T>(
 ): Promise<T> {
   const { token, ...init } = options;
   const url = `${getBaseUrl()}${path}`;
+  const method = (init.method || "GET").toUpperCase();
   const headers: HeadersInit = {
     "Content-Type": "application/json",
     ...(init.headers as Record<string, string>),
   };
   if (token) headers["Authorization"] = `Bearer ${token}`;
 
+  console.log("[API] Request:", method, path);
   const res = await fetch(url, { ...init, headers });
   let body: unknown;
   const ct = res.headers.get("content-type");
@@ -41,6 +43,8 @@ async function request<T>(
   } else {
     body = await res.text();
   }
+
+  console.log("[API] Response:", res.status, path, body);
 
   if (!res.ok) {
     const msg =
