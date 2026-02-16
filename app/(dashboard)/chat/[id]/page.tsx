@@ -7,7 +7,6 @@ import { chatsApi, sendMessage } from "@/lib/api";
 import { Sidebar } from "@/components/chat/sidebar";
 import { MessageList } from "@/components/chat/message-list";
 import { Composer } from "@/components/chat/composer";
-import type { AIModel } from "@/types";
 import type { Chat, Message } from "@/types";
 
 export default function ChatThreadPage() {
@@ -81,7 +80,7 @@ export default function ChatThreadPage() {
     if (chatId === id) router.replace("/chat");
   };
 
-  const handleSend = async (message: string, model: AIModel) => {
+  const handleSend = async (message: string) => {
     if (!token || !id) return;
     setSending(true);
     const userMessage: Message = {
@@ -93,7 +92,7 @@ export default function ChatThreadPage() {
     };
     setMessages((prev) => [...prev, userMessage]);
     try {
-      const res = await sendMessage(token, { chat_id: id, message, model });
+      const res = await sendMessage(token, { chat_id: id, message });
       setMessages((prev) => [
         ...prev,
         {

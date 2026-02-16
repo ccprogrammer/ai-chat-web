@@ -6,7 +6,6 @@ import { useAuth } from "@/lib/auth-context";
 import { chatsApi, sendMessage } from "@/lib/api";
 import { Sidebar } from "@/components/chat/sidebar";
 import { Composer } from "@/components/chat/composer";
-import type { AIModel } from "@/types";
 import type { Chat } from "@/types";
 
 function SparkleIcon({ className }: { className?: string }) {
@@ -61,13 +60,13 @@ export default function ChatIndexPage() {
     }
   };
 
-  const handleSendFromPlaceholder = async (message: string, model: AIModel) => {
+  const handleSendFromPlaceholder = async (message: string) => {
     if (!token) return;
     setSending(true);
     try {
       const chat = await chatsApi.create(token);
       setChats((prev) => [chat, ...prev]);
-      await sendMessage(token, { chat_id: chat.id, message, model });
+      await sendMessage(token, { chat_id: chat.id, message });
       router.push(`/chat/${chat.id}`);
     } catch {
       setSending(false);

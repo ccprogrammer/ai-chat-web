@@ -1,20 +1,9 @@
 "use client";
 
 import { useRef, useState, useEffect } from "react";
-import type { AIModel } from "@/types";
-
-const MODELS: { value: AIModel; label: string; description: string }[] = [
-  { value: "fast", label: "Fast", description: "Quick responses, lower cost" },
-  {
-    value: "balanced",
-    label: "Balanced",
-    description: "Speed and quality in balance",
-  },
-  { value: "smart", label: "Smart", description: "Best for complex tasks" },
-];
 
 interface ComposerProps {
-  onSend: (message: string, model: AIModel) => void;
+  onSend: (message: string) => void;
   disabled?: boolean;
   /** When true, no top border or background (for centering below greeting) */
   embedded?: boolean;
@@ -22,22 +11,9 @@ interface ComposerProps {
 
 export function Composer({ onSend, disabled, embedded }: ComposerProps) {
   const [text, setText] = useState("");
-  const [model, setModel] = useState<AIModel>("fast");
-  const [modelOpen, setModelOpen] = useState(false);
   const [plusOpen, setPlusOpen] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
-  const modelRef = useRef<HTMLDivElement>(null);
   const plusRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (!modelOpen) return;
-    const close = (e: MouseEvent) => {
-      if (modelRef.current?.contains(e.target as Node)) return;
-      setModelOpen(false);
-    };
-    document.addEventListener("click", close);
-    return () => document.removeEventListener("click", close);
-  }, [modelOpen]);
 
   useEffect(() => {
     if (!plusOpen) return;
@@ -53,7 +29,7 @@ export function Composer({ onSend, disabled, embedded }: ComposerProps) {
     e?.preventDefault();
     const trimmed = text.trim();
     if (!trimmed || disabled) return;
-    onSend(trimmed, model);
+    onSend(trimmed);
     setText("");
     const ta = textareaRef.current;
     if (ta) {
@@ -64,7 +40,6 @@ export function Composer({ onSend, disabled, embedded }: ComposerProps) {
   };
 
   const hasText = text.trim().length > 0;
-  const current = MODELS.find((m) => m.value === model) ?? MODELS[0];
 
   const MAX_LINES = 10;
   const LINE_HEIGHT_PX = 20;
@@ -109,7 +84,7 @@ export function Composer({ onSend, disabled, embedded }: ComposerProps) {
           />
         </div>
 
-        {/* Bottom bar: +, Tools | Model dropdown, Mic */}
+        {/* Bottom bar: +, Tools | Send / Mic */}
         <div className="flex items-center justify-between border-t border-gh-border px-2 py-2">
           <div className="flex items-center gap-0.5">
             <div className="relative" ref={plusRef}>
@@ -160,67 +135,6 @@ export function Composer({ onSend, disabled, embedded }: ComposerProps) {
           </div>
 
           <div className="flex items-center gap-1">
-            <div className="relative" ref={modelRef}>
-              <button
-                type="button"
-                onClick={() => !disabled && setModelOpen((o) => !o)}
-                disabled={disabled}
-                className="flex h-9 items-center gap-1 rounded-lg px-2.5 text-sm text-gh-fg-muted transition-colors hover:bg-gh-border-muted hover:text-gh-fg disabled:opacity-50"
-                aria-haspopup="listbox"
-                aria-expanded={modelOpen}
-              >
-                {current.label}
-                <svg
-                  className={`h-4 w-4 transition-transform ${modelOpen ? "rotate-180" : ""}`}
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                >
-                  <path d="M6 9l6 6 6-6" />
-                </svg>
-              </button>
-              {modelOpen && (
-                <div
-                  className="absolute right-0 bottom-full z-20 mb-1 min-w-[240px] max-h-[280px] overflow-auto rounded-xl border border-gh-border bg-gh-bg py-2 shadow-lg"
-                  role="listbox"
-                >
-                  {MODELS.map((m) => (
-                    <button
-                      key={m.value}
-                      type="button"
-                      role="option"
-                      aria-selected={model === m.value}
-                      onClick={() => {
-                        setModel(m.value);
-                        setModelOpen(false);
-                      }}
-                      className="flex w-full items-start gap-3 px-4 py-2.5 text-left hover:bg-gh-bg-subtle focus:outline-none"
-                    >
-                      <div className="min-w-0 flex-1">
-                        <div className="text-sm font-medium text-gh-fg">
-                          {m.label}
-                        </div>
-                        <div className="mt-0.5 text-xs text-gh-fg-muted">
-                          {m.description}
-                        </div>
-                      </div>
-                      {model === m.value && (
-                        <svg
-                          className="h-5 w-5 shrink-0 text-gh-accent"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                        >
-                          <path d="M20 6L9 17l-5-5" />
-                        </svg>
-                      )}
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
             {hasText ? (
               <button
                 type="submit"
