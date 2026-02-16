@@ -70,23 +70,19 @@ export default function DashboardLayout({
 }
 
 function SidebarToggle() {
-  const { collapsed, toggle } = useSidebar();
+  const { toggle } = useSidebar();
   return (
     <button
       type="button"
       onClick={toggle}
       className="rounded p-2 text-gh-fg-muted hover:bg-gh-bg-subtle hover:text-gh-fg"
-      aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+      aria-label="Toggle menu"
     >
-      {collapsed ? (
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          <path d="M15 19l-7-7 7-7" />
-        </svg>
-      ) : (
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          <path d="M9 5l7 7-7 7" />
-        </svg>
-      )}
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <line x1="3" y1="6" x2="21" y2="6" />
+        <line x1="3" y1="12" x2="21" y2="12" />
+        <line x1="3" y1="18" x2="21" y2="18" />
+      </svg>
     </button>
   );
 }
