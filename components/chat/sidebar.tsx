@@ -106,7 +106,7 @@ export function Sidebar({ chats, onCreateChat, onRenameChat, onDeleteChat, canDe
           ${collapsed ? "-translate-x-full md:translate-x-0 md:w-0" : "translate-x-0"}
         `}
       >
-      <div className="flex items-center justify-between border-b border-gh-border p-2.5 sm:p-3">
+      <div className="flex h-14 shrink-0 items-center justify-between border-b border-gh-border px-3 sm:px-4">
         <span className="text-sm font-medium text-gh-fg">Chats</span>
         <button
           type="button"
