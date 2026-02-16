@@ -85,3 +85,7 @@ The app expects the backend to expose:
 - `POST /chat` with `{ chat_id, message, model }` → `{ reply, chat_id }`
 
 See the [backend README](https://github.com/ccprogrammer/ai-chat) for full API details.
+
+## License
+
+MIT — see [LICENSE](LICENSE) for details.
