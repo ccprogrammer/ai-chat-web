@@ -40,3 +40,12 @@ export interface AuthResponse {
   access_token: string;
   token_type: string;
 }
+
+export type UserRole = "user" | "admin";
+
+export interface User {
+  id: string;
+  email: string;
+  role: UserRole;
+  created_at: string;
+}

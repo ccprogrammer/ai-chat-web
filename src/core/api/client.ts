@@ -50,6 +50,7 @@ export async function request<T>(
     if (res.status === 401 && typeof window !== "undefined") {
       localStorage.removeItem("ai_chat_token");
       localStorage.removeItem("ai_chat_email");
+      localStorage.removeItem("ai_chat_role");
       window.location.href = "/login";
     }
     const msg =

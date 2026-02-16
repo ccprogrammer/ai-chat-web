@@ -4,6 +4,8 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useRef, useState, useEffect } from "react";
 import { useSidebar } from "@/core/context/sidebar-context";
+import { useAuth } from "@/features/auth";
+import { SidebarUsers } from "@/features/admin/components/sidebar-users";
 import type { Chat } from "@/core/types";
 
 interface SidebarProps {
@@ -36,6 +38,7 @@ export function Sidebar({
   createChatDisabled,
 }: SidebarProps) {
   const pathname = usePathname();
+  const { isAdmin } = useAuth();
   const { collapsed, close } = useSidebar();
   const [menuOpenId, setMenuOpenId] = useState<string | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -262,6 +265,7 @@ export function Sidebar({
               );
             })}
           </ul>
+          {isAdmin && <SidebarUsers />}
         </nav>
       </aside>
     </div>

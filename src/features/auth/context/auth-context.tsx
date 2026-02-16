@@ -7,16 +7,20 @@ import React, {
   useEffect,
   useState,
 } from "react";
-import { TOKEN_KEY, EMAIL_KEY } from "@/core/constants/storage";
+import { TOKEN_KEY, EMAIL_KEY, ROLE_KEY } from "@/core/constants/storage";
+import type { UserRole } from "@/core/types";
 import { authRepository } from "../repository/auth.repository";
 
 type AuthContextValue = {
   token: string | null;
   email: string | null;
+  role: UserRole | null;
+  isAdmin: boolean;
   isLoading: boolean;
   login: (email: string, password: string) => Promise<void>;
   register: (email: string, password: string) => Promise<void>;
   logout: () => void;
+  refetchMe: () => Promise<void>;
   isAuthenticated: boolean;
 };
 
@@ -44,47 +48,83 @@ function setStoredEmail(email: string | null) {
   else localStorage.removeItem(EMAIL_KEY);
 }
 
+function getStoredRole(): UserRole | null {
+  if (typeof window === "undefined") return null;
+  const r = localStorage.getItem(ROLE_KEY);
+  return r === "admin" || r === "user" ? r : null;
+}
+
+function setStoredRole(role: UserRole | null) {
+  if (typeof window === "undefined") return;
+  if (role) localStorage.setItem(ROLE_KEY, role);
+  else localStorage.removeItem(ROLE_KEY);
+}
+
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [token, setToken] = useState<string | null>(null);
   const [email, setEmail] = useState<string | null>(null);
+  const [role, setRole] = useState<UserRole | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  useEffect(() => {
-    setToken(getStoredToken());
-    setEmail(getStoredEmail());
-    setIsLoading(false);
+  const fetchMe = useCallback(async (t: string) => {
+    const me = await authRepository.getMe(t);
+    setEmail(me.email);
+    const r: UserRole = me.role === "admin" ? "admin" : "user";
+    setRole(r);
+    setStoredEmail(me.email);
+    setStoredRole(r);
   }, []);
+
+  useEffect(() => {
+    const t = getStoredToken();
+    setToken(t);
+    setEmail(getStoredEmail());
+    setRole(getStoredRole());
+    if (t) {
+      fetchMe(t).catch(() => setIsLoading(false)).finally(() => setIsLoading(false));
+    } else {
+      setIsLoading(false);
+    }
+  }, [fetchMe]);
 
   const login = useCallback(async (emailArg: string, password: string) => {
     const { access_token } = await authRepository.login(emailArg, password);
     setToken(access_token);
-    setEmail(emailArg);
     setStoredToken(access_token);
-    setStoredEmail(emailArg);
-  }, []);
+    await fetchMe(access_token);
+  }, [fetchMe]);
 
   const register = useCallback(async (emailArg: string, password: string) => {
     const { access_token } = await authRepository.register(emailArg, password);
     setToken(access_token);
-    setEmail(emailArg);
     setStoredToken(access_token);
-    setStoredEmail(emailArg);
-  }, []);
+    await fetchMe(access_token);
+  }, [fetchMe]);
 
   const logout = useCallback(() => {
     setToken(null);
     setEmail(null);
+    setRole(null);
     setStoredToken(null);
     setStoredEmail(null);
+    setStoredRole(null);
   }, []);
+
+  const refetchMe = useCallback(async () => {
+    const t = getStoredToken();
+    if (t) await fetchMe(t);
+  }, [fetchMe]);
 
   const value: AuthContextValue = {
     token,
     email,
+    role,
+    isAdmin: role === "admin",
     isLoading,
     login,
     register,
     logout,
+    refetchMe,
     isAuthenticated: !!token,
   };
 

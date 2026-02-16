@@ -8,6 +8,10 @@ export const authRepository = {
   login: (email: string, password: string) =>
     authDatasource.login({ email, password }),
 
-  register: (email: string, password: string) =>
-    authDatasource.register({ email, password }),
+  register: async (email: string, password: string) => {
+    await authDatasource.register({ email, password });
+    return authDatasource.login({ email, password });
+  },
+
+  getMe: (token: string) => authDatasource.getMe(token),
 };
