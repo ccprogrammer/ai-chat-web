@@ -147,8 +147,10 @@ export default function ChatThreadPage() {
               isThinking={sending}
             />
             {!loadingMessages && (
-              <div className="sticky bottom-0 flex-shrink-0 bg-transparent pt-2">
-                <Composer onSend={handleSend} disabled={sending} />
+              <div className="sticky bottom-0 flex-shrink-0 bg-transparent px-4 pt-2">
+                <div className="mx-auto max-w-2xl">
+                  <Composer onSend={handleSend} disabled={sending} />
+                </div>
               </div>
             )}
           </div>

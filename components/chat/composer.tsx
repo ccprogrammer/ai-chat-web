@@ -58,9 +58,7 @@ export function Composer({ onSend, disabled, embedded }: ComposerProps) {
   return (
     <form
       onSubmit={handleSubmit}
-      className={
-        embedded ? "bg-transparent px-0 py-2" : "bg-transparent px-4 py-4"
-      }
+      className="bg-transparent px-4 py-4"
     >
       {/* Gemini-style capsule: text area on top, controls bar on bottom */}
       <div className="mx-auto max-w-3xl rounded-3xl border border-gh-border bg-gh-bg-subtle shadow-[0_-4px_12px_-2px_var(--gh-shadow),0_4px_24px_-8px_var(--gh-shadow)] focus-within:border-gh-accent/40 focus-within:ring-1 focus-within:ring-gh-accent/20">
