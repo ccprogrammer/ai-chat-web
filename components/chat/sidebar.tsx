@@ -87,7 +87,7 @@ export function Sidebar({ chats, onCreateChat, onRenameChat, onDeleteChat, canDe
 
   return (
     <div
-      className={`flex h-full w-0 shrink-0 flex-col overflow-hidden transition-[width] duration-300 ease-in-out ${collapsed ? "md:w-0" : "md:w-64"}`}
+      className={`flex h-full min-h-0 w-0 shrink-0 flex-col overflow-hidden transition-[width] duration-300 ease-in-out ${collapsed ? "md:w-0" : "md:w-64"}`}
     >
       {/* Mobile: backdrop when sidebar open */}
       <div

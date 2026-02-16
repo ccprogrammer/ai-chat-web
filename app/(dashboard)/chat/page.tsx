@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import { useAuth } from "@/lib/auth-context";
 import { chatsApi, sendMessage } from "@/lib/api";
+import { DashboardNavbar } from "@/components/dashboard-navbar";
 import { Sidebar } from "@/components/chat/sidebar";
 import { Composer } from "@/components/chat/composer";
 import type { Chat } from "@/types";
@@ -99,7 +100,7 @@ export default function ChatIndexPage() {
   };
 
   return (
-    <>
+    <div className="flex h-screen min-h-0 w-full items-stretch overflow-hidden">
       <Sidebar
         chats={chats}
         onCreateChat={handleCreateChat}
@@ -109,7 +110,9 @@ export default function ChatIndexPage() {
         isLoading={loading}
         createChatDisabled={chats.length === 0}
       />
-      <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
+      <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
+        <DashboardNavbar />
+        <main className="flex min-w-0 flex-1 flex-col overflow-hidden">
         <div className="flex flex-1 flex-col items-center justify-center px-3 py-8 sm:px-4 sm:py-12">
           <div className="flex w-full max-w-2xl flex-col items-center gap-6 sm:gap-8">
             <div className="flex flex-col items-center gap-3 text-center sm:gap-4">
@@ -124,7 +127,8 @@ export default function ChatIndexPage() {
             </div>
           </div>
         </div>
+        </main>
       </div>
-    </>
+    </div>
   );
 }

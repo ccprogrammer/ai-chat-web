@@ -4,6 +4,7 @@ import { useParams, useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import { useAuth } from "@/lib/auth-context";
 import { chatsApi, sendMessage } from "@/lib/api";
+import { DashboardNavbar } from "@/components/dashboard-navbar";
 import { Sidebar } from "@/components/chat/sidebar";
 import { MessageList } from "@/components/chat/message-list";
 import { Composer } from "@/components/chat/composer";
@@ -114,7 +115,7 @@ export default function ChatThreadPage() {
   const isEmpty = messages.length === 0 && !loadingMessages;
 
   return (
-    <>
+    <div className="flex h-screen min-h-0 w-full items-stretch overflow-hidden">
       <Sidebar
         chats={chats}
         onCreateChat={handleCreateChat}
@@ -123,7 +124,9 @@ export default function ChatThreadPage() {
         canDeleteChat={() => true}
         isLoading={loadingChats}
       />
-      <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
+      <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
+        <DashboardNavbar />
+        <main className="flex min-w-0 flex-1 flex-col overflow-hidden">
         {isEmpty ? (
           <div className="flex flex-1 flex-col items-center justify-center px-3 py-8 sm:px-4 sm:py-12">
             <div className="flex w-full max-w-2xl flex-col items-center gap-6 sm:gap-8">
@@ -155,8 +158,9 @@ export default function ChatThreadPage() {
             )}
           </div>
         )}
+        </main>
       </div>
-    </>
+    </div>
   );
 }
 
