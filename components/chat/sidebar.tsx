@@ -100,7 +100,7 @@ export function Sidebar({ chats, onCreateChat, onRenameChat, onDeleteChat, canDe
       {/* Sidebar: overlay on mobile, full-height column on desktop */}
       <aside
         className={`
-          fixed left-0 top-0 z-50 flex h-full w-64 flex-col overflow-hidden border-r border-gh-border bg-gh-bg-subtle
+          fixed left-0 top-0 z-50 flex h-full w-64 flex-col overflow-hidden bg-gh-bg-subtle
           transition-[transform,width] duration-300 ease-in-out
           md:relative md:left-auto md:top-auto md:z-auto md:h-full md:w-64
           ${collapsed ? "-translate-x-full md:translate-x-0 md:w-0" : "translate-x-0"}
