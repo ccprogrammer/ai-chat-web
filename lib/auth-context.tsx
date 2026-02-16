@@ -7,7 +7,7 @@ import React, {
   useEffect,
   useState,
 } from "react";
-import { authApi } from "./api";
+import { authRepository } from "./repositories/auth.repository";
 
 const TOKEN_KEY = "ai_chat_token";
 const EMAIL_KEY = "ai_chat_email";
@@ -58,7 +58,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const login = useCallback(async (emailArg: string, password: string) => {
-    const { access_token } = await authApi.login({ email: emailArg, password });
+    const { access_token } = await authRepository.login(emailArg, password);
     setToken(access_token);
     setEmail(emailArg);
     setStoredToken(access_token);
@@ -66,7 +66,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const register = useCallback(async (emailArg: string, password: string) => {
-    const { access_token } = await authApi.register({ email: emailArg, password });
+    const { access_token } = await authRepository.register(emailArg, password);
     setToken(access_token);
     setEmail(emailArg);
     setStoredToken(access_token);

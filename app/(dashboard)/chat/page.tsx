@@ -1,14 +1,10 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useCallback, useEffect, useState } from "react";
-import { useAuth } from "@/lib/auth-context";
-import { useToast } from "@/lib/toast-context";
-import { ApiError, chatsApi, sendMessage } from "@/lib/api";
+import { useChats } from "@/lib/hooks/use-chats";
 import { DashboardNavbar } from "@/components/dashboard-navbar";
 import { Sidebar } from "@/components/chat/sidebar";
 import { Composer } from "@/components/chat/composer";
-import type { Chat } from "@/types";
 
 function SparkleIcon({ className }: { className?: string }) {
   return (
@@ -21,97 +17,41 @@ function SparkleIcon({ className }: { className?: string }) {
 }
 
 export default function ChatIndexPage() {
-  const { token } = useAuth();
   const router = useRouter();
-  const { showError } = useToast();
-  const [chats, setChats] = useState<Chat[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [sending, setSending] = useState(false);
+  const {
+    chats,
+    loading,
+    sending,
+    createChat,
+    createChatWithFirstMessage,
+    renameChat,
+    deleteChat,
+  } = useChats();
 
-  const loadChats = useCallback(() => {
-    if (!token) return;
-    chatsApi
-      .list(token)
-      .then((res) => setChats(res.chats))
-      .catch((err) => {
-        setChats([]);
-        showError(err instanceof ApiError ? err.message : "Failed to load chats");
-      })
-      .finally(() => setLoading(false));
-  }, [token, showError]);
-
-  useEffect(() => {
-    loadChats();
-  }, [loadChats]);
-
-  const handleCreateChat = async () => {
-    if (!token) return;
+  const handleCreateChat = () => {
     if (chats.length === 0) return;
     const emptyNewChat = chats.find(
-      (c) => c.message_count === 0 && (!c.title || c.title.trim() === "" || c.title.trim().toLowerCase() === "new chat")
+      (c) =>
+        c.message_count === 0 &&
+        (!c.title ||
+          c.title.trim() === "" ||
+          c.title.trim().toLowerCase() === "new chat")
     );
     if (emptyNewChat) {
       router.push(`/chat/${emptyNewChat.id}`);
       return;
     }
-    setLoading(true);
-    try {
-      const chat = await chatsApi.create(token);
-      setChats((prev) => [chat, ...prev]);
-      router.push(`/chat/${chat.id}`);
-    } catch (err) {
-      showError(err instanceof ApiError ? err.message : "Failed to create chat");
-    } finally {
-      setLoading(false);
-    }
+    createChat();
   };
 
-  const handleSendFromPlaceholder = async (message: string) => {
-    if (!token) return;
-    setSending(true);
-    try {
-      const chat = await chatsApi.create(token);
-      setChats((prev) => [chat, ...prev]);
-      await sendMessage(token, { chat_id: chat.id, message });
-      router.push(`/chat/${chat.id}`);
-    } catch (err) {
-      showError(err instanceof ApiError ? err.message : "Something went wrong");
-    } finally {
-      setSending(false);
-    }
-  };
-
-  const handleRenameChat = async (chatId: string, newTitle: string) => {
-    if (!token) return;
-    try {
-      const updated = await chatsApi.update(token, chatId, newTitle);
-      setChats((prev) => prev.map((c) => (c.id === chatId ? updated : c)));
-    } catch (err) {
-      showError(err instanceof ApiError ? err.message : "Failed to rename chat");
-    }
-  };
-
-  const handleDeleteChat = async (id: string) => {
-    if (!token) return;
-    const deleted = chats.find((c) => String(c.id) === String(id));
-    setChats((prev) => prev.filter((c) => String(c.id) !== String(id)));
-    try {
-      await chatsApi.delete(token, id);
-    } catch (err) {
-      if (deleted) setChats((prev) => [deleted, ...prev]);
-      showError(err instanceof ApiError ? err.message : "Failed to delete chat");
-    }
-    if (typeof window !== "undefined" && window.location.pathname === `/chat/${id}`) {
-      router.replace("/chat");
-    }
-  };
+  const handleDeleteChat = (id: string) => deleteChat(id);
 
   return (
     <div className="flex h-screen min-h-0 w-full items-stretch overflow-hidden">
       <Sidebar
         chats={chats}
         onCreateChat={handleCreateChat}
-        onRenameChat={handleRenameChat}
+        onRenameChat={renameChat}
         onDeleteChat={handleDeleteChat}
         canDeleteChat={() => true}
         isLoading={loading}
@@ -120,20 +60,28 @@ export default function ChatIndexPage() {
       <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
         <DashboardNavbar />
         <main className="flex min-w-0 flex-1 flex-col overflow-hidden">
-        <div className="flex flex-1 flex-col items-center justify-center px-3 py-8 sm:px-4 sm:py-12">
-          <div className="flex w-full max-w-2xl flex-col items-center gap-6 sm:gap-8">
-            <div className="flex flex-col items-center gap-3 text-center sm:gap-4">
-              <SparkleIcon className="h-12 w-12 text-gh-accent sm:h-14 sm:w-14" />
-              <div>
-                <h2 className="text-lg font-semibold text-gh-fg sm:text-xl">Hi there</h2>
-                <p className="mt-2 text-xl font-medium text-gh-fg sm:text-2xl md:text-3xl">Where should we start?</p>
+          <div className="flex flex-1 flex-col items-center justify-center px-3 py-8 sm:px-4 sm:py-12">
+            <div className="flex w-full max-w-2xl flex-col items-center gap-6 sm:gap-8">
+              <div className="flex flex-col items-center gap-3 text-center sm:gap-4">
+                <SparkleIcon className="h-12 w-12 text-gh-accent sm:h-14 sm:w-14" />
+                <div>
+                  <h2 className="text-lg font-semibold text-gh-fg sm:text-xl">
+                    Hi there
+                  </h2>
+                  <p className="mt-2 text-xl font-medium text-gh-fg sm:text-2xl md:text-3xl">
+                    Where should we start?
+                  </p>
+                </div>
+              </div>
+              <div className="w-full max-w-3xl px-2 sm:px-0">
+                <Composer
+                  onSend={createChatWithFirstMessage}
+                  disabled={sending}
+                  embedded
+                />
               </div>
             </div>
-            <div className="w-full max-w-3xl px-2 sm:px-0">
-              <Composer onSend={handleSendFromPlaceholder} disabled={sending} embedded />
-            </div>
           </div>
-        </div>
         </main>
       </div>
     </div>

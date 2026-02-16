@@ -1,6 +1,7 @@
 /**
- * API client for AI Chat backend (FastAPI).
- * Base URL is read from NEXT_PUBLIC_API_URL (default http://localhost:8000).
+ * DataSource layer: low-level API client.
+ * Handles HTTP requests, auth headers, 401 redirect, logging.
+ * Base URL from NEXT_PUBLIC_API_URL (default http://localhost:8000).
  */
 
 const getBaseUrl = () =>

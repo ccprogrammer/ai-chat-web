@@ -1,28 +1,39 @@
 "use client";
 
-import { useParams, useRouter } from "next/navigation";
-import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
-import { useAuth } from "@/lib/auth-context";
-import { useToast } from "@/lib/toast-context";
-import { ApiError, chatsApi, sendMessage } from "@/lib/api";
+import { useParams } from "next/navigation";
+import { useLayoutEffect, useRef } from "react";
+import { useChats } from "@/lib/hooks/use-chats";
+import { useChatMessages } from "@/lib/hooks/use-chat-messages";
 import { DashboardNavbar } from "@/components/dashboard-navbar";
 import { Sidebar } from "@/components/chat/sidebar";
 import { MessageList } from "@/components/chat/message-list";
 import { Composer } from "@/components/chat/composer";
-import type { Chat, Message } from "@/types";
 
 export default function ChatThreadPage() {
   const params = useParams();
   const id = params.id as string;
-  const { token } = useAuth();
-  const router = useRouter();
-  const { showError } = useToast();
-  const [chats, setChats] = useState<Chat[]>([]);
-  const [messages, setMessages] = useState<Message[]>([]);
-  const [loadingChats, setLoadingChats] = useState(true);
-  const [loadingMessages, setLoadingMessages] = useState(true);
-  const [sending, setSending] = useState(false);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
+
+  const {
+    chats,
+    loading: loadingChats,
+    refetch: refetchChats,
+    createChat,
+    renameChat,
+    deleteChat,
+  } = useChats(id);
+
+  const {
+    messages,
+    loading: loadingMessages,
+    sending,
+    sendMessage,
+  } = useChatMessages(id);
+
+  const handleSend = async (message: string) => {
+    const res = await sendMessage(message);
+    if (res) refetchChats();
+  };
 
   useLayoutEffect(() => {
     const el = scrollContainerRef.current;
@@ -30,107 +41,13 @@ export default function ChatThreadPage() {
     el.scrollTop = el.scrollHeight - el.clientHeight;
   }, [messages.length, loadingMessages, sending]);
 
-  const loadChats = useCallback(() => {
-    if (!token) return;
-    chatsApi
-      .list(token)
-      .then((res) => setChats(res.chats))
-      .catch((err) => {
-        setChats([]);
-        showError(err instanceof ApiError ? err.message : "Failed to load chats");
-      })
-      .finally(() => setLoadingChats(false));
-  }, [token, showError]);
-
-  useEffect(() => {
-    loadChats();
-  }, [loadChats]);
-
-  useEffect(() => {
-    if (!token || !id) return;
-    setLoadingMessages(true);
-    chatsApi
-      .getMessages(token, id)
-      .then(setMessages)
-      .catch((err) => {
-        setMessages([]);
-        showError(err instanceof ApiError ? err.message : "Failed to load messages");
-      })
-      .finally(() => setLoadingMessages(false));
-  }, [token, id, showError]);
-
-  const handleCreateChat = async () => {
-    if (!token) return;
-    const hasEmptyNewChat = chats.some(
-      (c) => c.message_count === 0 && (!c.title || c.title.trim() === "" || c.title.trim().toLowerCase() === "new chat")
-    );
-    if (hasEmptyNewChat) return;
-    setLoadingChats(true);
-    try {
-      const chat = await chatsApi.create(token);
-      setChats((prev) => [chat, ...prev]);
-      router.push(`/chat/${chat.id}`);
-    } catch (err) {
-      showError(err instanceof ApiError ? err.message : "Failed to create chat");
-    } finally {
-      setLoadingChats(false);
-    }
-  };
-
-  const handleRenameChat = async (chatId: string, newTitle: string) => {
-    if (!token) return;
-    try {
-      const updated = await chatsApi.update(token, chatId, newTitle);
-      setChats((prev) => prev.map((c) => (c.id === chatId ? updated : c)));
-    } catch (err) {
-      showError(err instanceof ApiError ? err.message : "Failed to rename chat");
-    }
-  };
-
-  const handleDeleteChat = async (chatId: string) => {
-    if (!token) return;
-    const deleted = chats.find((c) => String(c.id) === String(chatId));
-    setChats((prev) => prev.filter((c) => String(c.id) !== String(chatId)));
-    try {
-      await chatsApi.delete(token, chatId);
-    } catch (err) {
-      if (deleted) setChats((prev) => [deleted, ...prev]);
-      showError(err instanceof ApiError ? err.message : "Failed to delete chat");
-    }
-    if (chatId === id) router.replace("/chat");
-  };
-
-  const handleSend = async (message: string) => {
-    if (!token || !id) return;
-    setSending(true);
-    const userMessage: Message = {
-      id: -1,
-      chat_id: id,
-      role: "user",
-      content: message,
-      created_at: new Date().toISOString(),
-    };
-    setMessages((prev) => [...prev, userMessage]);
-    try {
-      const res = await sendMessage(token, { chat_id: id, message });
-      setMessages((prev) => [
-        ...prev,
-        {
-          id: -2,
-          chat_id: id,
-          role: "assistant",
-          content: res.reply,
-          created_at: new Date().toISOString(),
-        },
-      ]);
-      loadChats();
-    } catch (err) {
-      setMessages((prev) => prev.filter((m) => m.id !== -1));
-      showError(err instanceof ApiError ? err.message : "Failed to send message");
-    } finally {
-      setSending(false);
-    }
-  };
+  const hasEmptyNewChat = chats.some(
+    (c) =>
+      c.message_count === 0 &&
+      (!c.title ||
+        c.title.trim() === "" ||
+        c.title.trim().toLowerCase() === "new chat")
+  );
 
   const isEmpty = messages.length === 0 && !loadingMessages;
 
@@ -138,46 +55,53 @@ export default function ChatThreadPage() {
     <div className="flex h-screen min-h-0 w-full items-stretch overflow-hidden">
       <Sidebar
         chats={chats}
-        onCreateChat={handleCreateChat}
-        onRenameChat={handleRenameChat}
-        onDeleteChat={handleDeleteChat}
+        onCreateChat={() => !hasEmptyNewChat && createChat()}
+        onRenameChat={renameChat}
+        onDeleteChat={deleteChat}
         canDeleteChat={() => true}
         isLoading={loadingChats}
       />
       <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
         <DashboardNavbar />
         <main className="flex min-w-0 flex-1 flex-col overflow-hidden">
-        {isEmpty ? (
-          <div className="flex flex-1 flex-col items-center justify-center px-3 py-8 sm:px-4 sm:py-12">
-            <div className="flex w-full max-w-2xl flex-col items-center gap-6 sm:gap-8">
-              <div className="flex flex-col items-center gap-3 text-center sm:gap-4">
-                <SparkleIcon className="h-12 w-12 text-gh-accent sm:h-14 sm:w-14" />
-                <div>
-                  <h2 className="text-lg font-semibold text-gh-fg sm:text-xl">Hi there</h2>
-                  <p className="mt-2 text-xl font-medium text-gh-fg sm:text-2xl md:text-3xl">Where should we start?</p>
+          {isEmpty ? (
+            <div className="flex flex-1 flex-col items-center justify-center px-3 py-8 sm:px-4 sm:py-12">
+              <div className="flex w-full max-w-2xl flex-col items-center gap-6 sm:gap-8">
+                <div className="flex flex-col items-center gap-3 text-center sm:gap-4">
+                  <SparkleIcon className="h-12 w-12 text-gh-accent sm:h-14 sm:w-14" />
+                  <div>
+                    <h2 className="text-lg font-semibold text-gh-fg sm:text-xl">
+                      Hi there
+                    </h2>
+                    <p className="mt-2 text-xl font-medium text-gh-fg sm:text-2xl md:text-3xl">
+                      Where should we start?
+                    </p>
+                  </div>
                 </div>
-              </div>
-              <div className="w-full max-w-3xl px-2 sm:px-0">
-                <Composer onSend={handleSend} disabled={sending} embedded />
+                <div className="w-full max-w-3xl px-2 sm:px-0">
+                  <Composer onSend={handleSend} disabled={sending} embedded />
+                </div>
               </div>
             </div>
-          </div>
-        ) : (
-          <div ref={scrollContainerRef} className="flex min-h-0 flex-1 flex-col overflow-y-auto">
-            <MessageList
-              messages={messages}
-              isLoading={loadingMessages && messages.length === 0}
-              isThinking={sending}
-            />
-            {!loadingMessages && (
-              <div className="sticky bottom-0 flex-shrink-0 bg-transparent px-2 pt-2 sm:px-4">
-                <div className="mx-auto max-w-2xl">
-                  <Composer onSend={handleSend} disabled={sending} />
+          ) : (
+            <div
+              ref={scrollContainerRef}
+              className="flex min-h-0 flex-1 flex-col overflow-y-auto"
+            >
+              <MessageList
+                messages={messages}
+                isLoading={loadingMessages && messages.length === 0}
+                isThinking={sending}
+              />
+              {!loadingMessages && (
+                <div className="sticky bottom-0 flex-shrink-0 bg-transparent px-2 pt-2 sm:px-4">
+                  <div className="mx-auto max-w-2xl">
+                    <Composer onSend={handleSend} disabled={sending} />
+                  </div>
                 </div>
-              </div>
-            )}
-          </div>
-        )}
+              )}
+            </div>
+          )}
         </main>
       </div>
     </div>
