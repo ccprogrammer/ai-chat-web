@@ -33,7 +33,7 @@ export default function DashboardLayout({
   return (
     <SidebarProvider>
       <div className="flex h-screen flex-col overflow-hidden">
-        <header className="flex h-14 shrink-0 items-center justify-between border-b border-gh-border bg-gh-bg px-4">
+        <header className="flex h-14 shrink-0 items-center justify-between gap-2 border-b border-gh-border bg-gh-bg px-3 sm:px-4">
           <div className="flex items-center gap-2">
             <SidebarToggle />
             <Link href="/chat" className="text-lg font-semibold text-gh-fg">
@@ -63,7 +63,7 @@ export default function DashboardLayout({
             </button>
           </div>
         </header>
-        <main className="flex flex-1 overflow-hidden">{children}</main>
+        <main className="flex min-w-0 flex-1 overflow-hidden">{children}</main>
       </div>
     </SidebarProvider>
   );

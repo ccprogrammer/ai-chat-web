@@ -18,14 +18,14 @@ export function MessageList({ messages, isLoading, isThinking }: MessageListProp
   }
 
   return (
-    <ul className="flex flex-col gap-4 p-4">
+    <ul className="flex flex-col gap-4 p-3 sm:p-4">
       {messages.map((msg) => (
         <li
           key={msg.id}
-          className={`flex gap-3 ${msg.role === "user" ? "justify-end" : "justify-start"}`}
+          className={`flex gap-2 sm:gap-3 ${msg.role === "user" ? "justify-end" : "justify-start"}`}
         >
           <div
-            className={`max-w-[85%] rounded-2xl border px-4 py-3 ${
+            className={`max-w-[90%] sm:max-w-[85%] rounded-2xl border px-3 py-2.5 sm:px-4 sm:py-3 ${
               msg.role === "user"
                 ? "border-gh-accent bg-gh-accent/10 text-gh-fg"
                 : "border-gh-border bg-gh-bg-subtle text-gh-fg"
@@ -40,7 +40,7 @@ export function MessageList({ messages, isLoading, isThinking }: MessageListProp
       ))}
       {(isLoading || isThinking) && (
         <li className="flex justify-start">
-          <div className="rounded-2xl border border-gh-border bg-gh-bg-subtle px-4 py-3">
+          <div className="rounded-2xl border border-gh-border bg-gh-bg-subtle px-3 py-2.5 sm:px-4 sm:py-3">
             <span className="text-gh-fg-muted">Thinking…</span>
           </div>
         </li>

@@ -29,7 +29,15 @@ function formatDate(iso: string) {
 
 export function Sidebar({ chats, onCreateChat, onRenameChat, onDeleteChat, canDeleteChat, isLoading, createChatDisabled }: SidebarProps) {
   const pathname = usePathname();
-  const { collapsed } = useSidebar();
+  const { collapsed, close } = useSidebar();
+
+  useEffect(() => {
+    if (typeof window !== "undefined" && window.innerWidth < 768) close();
+  }, [pathname, close]);
+
+  const handleLinkClick = () => {
+    if (typeof window !== "undefined" && window.innerWidth < 768) close();
+  };
   const [menuOpenId, setMenuOpenId] = useState<string | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editingTitle, setEditingTitle] = useState("");
@@ -77,13 +85,26 @@ export function Sidebar({ chats, onCreateChat, onRenameChat, onDeleteChat, canDe
     }
   };
 
-  if (collapsed) {
-    return null;
-  }
-
   return (
-    <aside className="flex w-64 shrink-0 flex-col border-r border-gh-border bg-gh-bg-subtle transition-[width] duration-200">
-      <div className="flex items-center justify-between border-b border-gh-border p-3">
+    <>
+      {/* Mobile: backdrop when sidebar open */}
+      <div
+        className={`fixed inset-0 z-40 bg-black/50 transition-opacity duration-300 md:hidden ${
+          collapsed ? "pointer-events-none opacity-0" : "opacity-100"
+        }`}
+        onClick={() => !collapsed && close()}
+        aria-hidden="true"
+      />
+      {/* Sidebar: overlay on mobile, inline on desktop */}
+      <aside
+        className={`
+          fixed left-0 top-0 z-50 flex h-full w-64 shrink-0 flex-col overflow-hidden border-r border-gh-border bg-gh-bg-subtle
+          transition-[transform,width] duration-300 ease-in-out
+          md:relative md:top-auto md:z-auto md:h-auto md:shrink-0
+          ${collapsed ? "-translate-x-full md:translate-x-0 md:w-0" : "translate-x-0 md:w-64"}
+        `}
+      >
+      <div className="flex items-center justify-between border-b border-gh-border p-2.5 sm:p-3">
         <span className="text-sm font-medium text-gh-fg">Chats</span>
         <button
           type="button"
@@ -94,7 +115,7 @@ export function Sidebar({ chats, onCreateChat, onRenameChat, onDeleteChat, canDe
           New chat
         </button>
       </div>
-      <nav className="flex-1 overflow-y-auto p-2">
+      <nav className="flex-1 overflow-y-auto p-1.5 sm:p-2">
         {chats.length === 0 && !isLoading && (
           <p className="px-2 py-4 text-sm text-gh-fg-muted">No chats yet. Start one above.</p>
         )}
@@ -144,6 +165,7 @@ export function Sidebar({ chats, onCreateChat, onRenameChat, onDeleteChat, canDe
               <li key={chat.id} className="group relative">
                 <Link
                   href={href}
+                  onClick={handleLinkClick}
                   className={`block rounded-lg px-3 py-2 pr-9 text-sm text-gh-fg hover:bg-gh-border-muted ${
                     isActive ? "bg-gh-border-muted font-medium" : ""
                   }`}
@@ -203,5 +225,6 @@ export function Sidebar({ chats, onCreateChat, onRenameChat, onDeleteChat, canDe
         </ul>
       </nav>
     </aside>
+    </>
   );
 }

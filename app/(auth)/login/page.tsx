@@ -34,7 +34,7 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="gh-card p-6">
+    <div className="gh-card p-4 sm:p-6">
       <h1 className="mb-4 text-xl font-semibold text-gh-fg">Sign in</h1>
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
         <div>

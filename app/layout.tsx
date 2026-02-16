@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import { AuthProvider } from "@/lib/auth-context";
 import { ThemeProvider } from "@/components/theme-provider";
@@ -6,6 +6,11 @@ import { ThemeProvider } from "@/components/theme-provider";
 export const metadata: Metadata = {
   title: "AI Chat",
   description: "Chat with AI — multiple conversations, persistent history.",
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
 };
 
 export default function RootLayout({

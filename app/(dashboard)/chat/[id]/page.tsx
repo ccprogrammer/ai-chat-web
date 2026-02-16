@@ -123,18 +123,18 @@ export default function ChatThreadPage() {
         canDeleteChat={() => true}
         isLoading={loadingChats}
       />
-      <div className="flex flex-1 flex-col overflow-hidden">
+      <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
         {isEmpty ? (
-          <div className="flex flex-1 flex-col items-center justify-center px-4 py-12">
-            <div className="flex w-full max-w-2xl flex-col items-center gap-8">
-              <div className="flex flex-col items-center gap-4 text-center">
-                <SparkleIcon className="h-14 w-14 text-gh-accent" />
+          <div className="flex flex-1 flex-col items-center justify-center px-3 py-8 sm:px-4 sm:py-12">
+            <div className="flex w-full max-w-2xl flex-col items-center gap-6 sm:gap-8">
+              <div className="flex flex-col items-center gap-3 text-center sm:gap-4">
+                <SparkleIcon className="h-12 w-12 text-gh-accent sm:h-14 sm:w-14" />
                 <div>
-                  <h2 className="text-xl font-semibold text-gh-fg">Hi there</h2>
-                  <p className="mt-2 text-2xl font-medium text-gh-fg sm:text-3xl">Where should we start?</p>
+                  <h2 className="text-lg font-semibold text-gh-fg sm:text-xl">Hi there</h2>
+                  <p className="mt-2 text-xl font-medium text-gh-fg sm:text-2xl md:text-3xl">Where should we start?</p>
                 </div>
               </div>
-              <div className="w-full max-w-3xl">
+              <div className="w-full max-w-3xl px-2 sm:px-0">
                 <Composer onSend={handleSend} disabled={sending} embedded />
               </div>
             </div>
@@ -147,7 +147,7 @@ export default function ChatThreadPage() {
               isThinking={sending}
             />
             {!loadingMessages && (
-              <div className="sticky bottom-0 flex-shrink-0 bg-transparent px-4 pt-2">
+              <div className="sticky bottom-0 flex-shrink-0 bg-transparent px-2 pt-2 sm:px-4">
                 <div className="mx-auto max-w-2xl">
                   <Composer onSend={handleSend} disabled={sending} />
                 </div>
