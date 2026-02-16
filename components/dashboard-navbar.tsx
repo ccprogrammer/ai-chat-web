@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useRef, useState, useEffect } from "react";
 import { useAuth } from "@/lib/auth-context";
@@ -40,9 +39,6 @@ export function DashboardNavbar() {
             <line x1="3" y1="18" x2="21" y2="18" />
           </svg>
         </button>
-        <Link href="/chat" className="text-lg font-semibold text-gh-fg">
-          AI Chat
-        </Link>
       </div>
       <div className="flex items-center gap-2">
         <button
