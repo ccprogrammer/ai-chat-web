@@ -52,7 +52,6 @@ export async function request<T>(
       localStorage.removeItem("ai_chat_token");
       localStorage.removeItem("ai_chat_email");
       localStorage.removeItem("ai_chat_role");
-      window.location.href = "/login";
     }
     const msg =
       typeof body === "object" && body !== null && "detail" in body

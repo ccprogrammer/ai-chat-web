@@ -81,7 +81,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setEmail(getStoredEmail());
     setRole(getStoredRole());
     if (t) {
-      fetchMe(t).catch(() => setIsLoading(false)).finally(() => setIsLoading(false));
+      fetchMe(t)
+        .catch(() => {
+          setToken(null);
+          setEmail(null);
+          setRole(null);
+          setStoredToken(null);
+          setStoredEmail(null);
+          setStoredRole(null);
+        })
+        .finally(() => setIsLoading(false));
     } else {
       setIsLoading(false);
     }
@@ -91,15 +100,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const { access_token } = await authRepository.login(emailArg, password);
     setToken(access_token);
     setStoredToken(access_token);
-    await fetchMe(access_token);
-  }, [fetchMe]);
+    // Redirect immediately so user reaches dashboard; fetchMe runs on next page load.
+    // (If we awaited fetchMe here and it returned 401, the API client would redirect
+    // back to /login, making it seem like login "didn't redirect".)
+    window.location.href = "/chat";
+  }, []);
 
   const register = useCallback(async (emailArg: string, password: string) => {
     const { access_token } = await authRepository.register(emailArg, password);
     setToken(access_token);
     setStoredToken(access_token);
-    await fetchMe(access_token);
-  }, [fetchMe]);
+    window.location.href = "/chat";
+  }, []);
 
   const logout = useCallback(() => {
     setToken(null);

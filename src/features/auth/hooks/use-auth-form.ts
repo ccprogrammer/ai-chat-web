@@ -5,7 +5,6 @@
  */
 
 import { useCallback, useState } from "react";
-import { useRouter } from "next/navigation";
 import { ApiError } from "@/core/api";
 import { useAuth } from "../context/auth-context";
 
@@ -13,7 +12,6 @@ type AuthFormMode = "login" | "register";
 
 export function useAuthForm(mode: AuthFormMode) {
   const { login, register, isAuthenticated } = useAuth();
-  const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -30,7 +28,7 @@ export function useAuthForm(mode: AuthFormMode) {
         } else {
           await register(email, password);
         }
-        router.replace("/chat");
+        // Both login and register do window.location.href = "/chat" and navigate away
       } catch (err) {
         setError(
           err instanceof ApiError
@@ -43,7 +41,7 @@ export function useAuthForm(mode: AuthFormMode) {
         setLoading(false);
       }
     },
-    [email, password, mode, login, register, router]
+    [email, password, mode, login, register]
   );
 
   return {

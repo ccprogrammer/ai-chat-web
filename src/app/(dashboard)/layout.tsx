@@ -1,7 +1,6 @@
 "use client";
 
-import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import Link from "next/link";
 import { useAuth } from "@/features/auth";
 import { SidebarProvider } from "@/core/context/sidebar-context";
 
@@ -11,11 +10,6 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   const { isAuthenticated, isLoading } = useAuth();
-  const router = useRouter();
-
-  useEffect(() => {
-    if (!isLoading && !isAuthenticated) router.replace("/login");
-  }, [isLoading, isAuthenticated, router]);
 
   if (isLoading) {
     return (
@@ -25,7 +19,18 @@ export default function DashboardLayout({
     );
   }
 
-  if (!isAuthenticated) return null;
+  if (!isAuthenticated) {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <p className="text-gh-fg-muted">
+          Session invalid.{" "}
+          <Link href="/login" className="gh-link">
+            Sign in
+          </Link>
+        </p>
+      </div>
+    );
+  }
 
   return <SidebarProvider>{children}</SidebarProvider>;
 }
