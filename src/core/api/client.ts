@@ -32,16 +32,17 @@ export async function request<T>(
 
   console.log("[API] Request:", method, path);
   const res = await fetch(url, { ...init, headers });
+  const raw = await res.text();
   let body: unknown;
   const ct = res.headers.get("content-type");
-  if (ct?.includes("application/json")) {
+  if (ct?.includes("application/json") && raw.length > 0) {
     try {
-      body = await res.json();
+      body = JSON.parse(raw);
     } catch {
-      body = await res.text();
+      body = raw;
     }
   } else {
-    body = await res.text();
+    body = raw || undefined;
   }
 
   console.log("[API] Response:", res.status, path, body);

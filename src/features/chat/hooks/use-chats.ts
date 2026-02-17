@@ -60,11 +60,9 @@ export function useChats(currentChatId?: string) {
       try {
         const chat = await chatRepository.create(token);
         setChats((prev) => [chat, ...prev]);
-        await chatRepository.sendMessage(token, {
-          chat_id: chat.id,
-          message,
-        });
-        router.push(`/chat/${chat.id}`);
+        // Navigate immediately so the chat opens; thread page will send the message
+        const params = new URLSearchParams({ send: message });
+        router.push(`/chat/${chat.id}?${params.toString()}`);
       } catch (err) {
         showError(
           err instanceof ApiError ? err.message : "Something went wrong"

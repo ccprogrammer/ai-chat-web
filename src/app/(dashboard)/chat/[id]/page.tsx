@@ -1,7 +1,7 @@
 "use client";
 
-import { useParams } from "next/navigation";
-import { useLayoutEffect, useRef } from "react";
+import { useParams, useSearchParams, useRouter } from "next/navigation";
+import { useLayoutEffect, useRef, useEffect } from "react";
 import {
   useChats,
   useChatMessages,
@@ -13,6 +13,8 @@ import {
 
 export default function ChatThreadPage() {
   const params = useParams();
+  const searchParams = useSearchParams();
+  const router = useRouter();
   const id = params.id as string;
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
@@ -31,6 +33,18 @@ export default function ChatThreadPage() {
     sending,
     sendMessage,
   } = useChatMessages(id);
+
+  const pendingSentRef = useRef(false);
+  useEffect(() => {
+    const pending = searchParams.get("send");
+    if (!id || !pending || pendingSentRef.current) return;
+    pendingSentRef.current = true;
+    router.replace(`/chat/${id}`, { scroll: false });
+    (async () => {
+      const res = await sendMessage(pending);
+      if (res) refetchChats();
+    })();
+  }, [id, searchParams, router, sendMessage, refetchChats]);
 
   const handleSend = async (message: string) => {
     const res = await sendMessage(message);
