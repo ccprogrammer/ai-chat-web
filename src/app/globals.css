@@ -37,9 +37,14 @@
 @layer base {
   html {
     @apply antialiased;
+    overflow-x: hidden;
+    -webkit-text-size-adjust: 100%;
   }
   body {
     @apply bg-gh-bg text-gh-fg font-sans;
+    overflow-x: hidden;
+    min-height: 100dvh;
+    min-height: -webkit-fill-available;
   }
 }
 
@@ -96,4 +101,11 @@
 }
 *::-webkit-scrollbar-thumb:hover {
   background: var(--scrollbar-thumb-hover);
+}
+
+/* Mobile-friendly full height: dvh accounts for mobile browser chrome */
+.h-mobile-screen {
+  height: 100vh;
+  height: 100dvh;
+  min-height: 0;
 }

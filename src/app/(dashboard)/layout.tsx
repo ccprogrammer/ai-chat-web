@@ -13,7 +13,7 @@ export default function DashboardLayout({
 
   if (isLoading) {
     return (
-      <div className="flex min-h-screen items-center justify-center">
+      <div className="flex min-h-[100dvh] min-h-[100vh] items-center justify-center">
         <span className="text-gh-fg-muted">Loading…</span>
       </div>
     );
@@ -21,7 +21,7 @@ export default function DashboardLayout({
 
   if (!isAuthenticated) {
     return (
-      <div className="flex min-h-screen items-center justify-center">
+      <div className="flex min-h-[100dvh] min-h-[100vh] items-center justify-center">
         <p className="text-gh-fg-muted">
           Session invalid.{" "}
           <Link href="/login" className="gh-link">

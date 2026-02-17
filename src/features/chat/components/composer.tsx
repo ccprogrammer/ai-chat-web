@@ -46,9 +46,9 @@ export function Composer({ onSend, disabled, embedded }: ComposerProps) {
   return (
     <form
       onSubmit={handleSubmit}
-      className="bg-transparent px-2 py-3 sm:px-4 sm:py-4"
+      className="bg-transparent px-2 py-2 pb-[calc(0.5rem+env(safe-area-inset-bottom))] sm:px-4 sm:py-4 sm:pb-4"
     >
-      <div className="mx-auto flex max-w-3xl items-end gap-2 rounded-2xl border border-gh-border bg-gh-bg-subtle px-3 py-2 shadow-[0_-4px_12px_-2px_var(--gh-shadow),0_4px_24px_-8px_var(--gh-shadow)] focus-within:border-gh-accent/40 focus-within:ring-1 focus-within:ring-gh-accent/20 sm:rounded-3xl sm:px-4 sm:py-3">
+      <div className="mx-auto flex max-w-3xl min-w-0 items-end gap-2 rounded-2xl border border-gh-border bg-gh-bg-subtle px-3 py-2 shadow-[0_-4px_12px_-2px_var(--gh-shadow),0_4px_24px_-8px_var(--gh-shadow)] focus-within:border-gh-accent/40 focus-within:ring-1 focus-within:ring-gh-accent/20 sm:rounded-3xl sm:px-4 sm:py-3">
         <textarea
           ref={textareaRef}
           value={text}
@@ -68,7 +68,7 @@ export function Composer({ onSend, disabled, embedded }: ComposerProps) {
         <button
           type="submit"
           disabled={disabled || !hasText}
-          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-gh-fg-muted hover:bg-gh-border-muted hover:text-gh-fg focus:outline-none focus:ring-2 focus:ring-gh-accent focus:ring-offset-1 focus:ring-offset-gh-bg-subtle disabled:opacity-50"
+          className="flex h-11 min-h-[44px] w-11 min-w-[44px] shrink-0 items-center justify-center rounded-lg text-gh-fg-muted hover:bg-gh-border-muted hover:text-gh-fg focus:outline-none focus:ring-2 focus:ring-gh-accent focus:ring-offset-1 focus:ring-offset-gh-bg-subtle disabled:opacity-50 sm:h-9 sm:w-9 sm:min-h-0 sm:min-w-0"
           aria-label="Send message"
         >
           <svg

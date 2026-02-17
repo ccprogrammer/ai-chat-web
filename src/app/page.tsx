@@ -15,7 +15,7 @@ export default function HomePage() {
 
   if (isLoading) {
     return (
-      <div className="flex min-h-screen items-center justify-center">
+      <div className="flex min-h-[100dvh] min-h-[100vh] items-center justify-center">
         <span className="text-gh-fg-muted">Loading…</span>
       </div>
     );
@@ -24,8 +24,8 @@ export default function HomePage() {
   if (isAuthenticated) return null;
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center gap-6 px-4">
-      <h1 className="text-3xl font-semibold text-gh-fg">AI Chat</h1>
+    <div className="flex min-h-[100dvh] min-h-[100vh] flex-col items-center justify-center gap-6 px-4 py-6">
+      <h1 className="text-2xl font-semibold text-gh-fg sm:text-3xl">AI Chat</h1>
       <p className="max-w-md text-center text-gh-fg-muted">
         Multiple conversations, persistent history. Sign in or create an account
         to start.

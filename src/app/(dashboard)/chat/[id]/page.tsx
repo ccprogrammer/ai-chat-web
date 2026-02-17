@@ -68,7 +68,7 @@ export default function ChatThreadPage() {
   const isEmpty = messages.length === 0 && !loadingMessages;
 
   return (
-    <div className="flex h-screen min-h-0 w-full items-stretch overflow-hidden">
+    <div className="flex h-mobile-screen w-full min-w-0 items-stretch overflow-hidden">
       <Sidebar
         chats={chats}
         onCreateChat={() => !hasEmptyNewChat && createChat()}
@@ -81,15 +81,15 @@ export default function ChatThreadPage() {
         <DashboardNavbar />
         <main className="flex min-w-0 flex-1 flex-col overflow-hidden">
           {isEmpty ? (
-            <div className="flex flex-1 flex-col items-center justify-center px-3 py-8 sm:px-4 sm:py-12">
-              <div className="flex w-full max-w-2xl flex-col items-center gap-6 sm:gap-8">
-                <div className="flex flex-col items-center gap-3 text-center sm:gap-4">
-                  <SparkleIcon className="h-12 w-12 text-gh-accent sm:h-14 sm:w-14" />
+            <div className="flex flex-1 flex-col items-center justify-center px-3 py-4 sm:py-8 sm:px-4 sm:py-12">
+              <div className="flex w-full max-w-2xl flex-col items-center gap-4 sm:gap-6 md:gap-8">
+                <div className="flex flex-col items-center gap-2 text-center sm:gap-3 md:gap-4">
+                  <SparkleIcon className="h-10 w-10 text-gh-accent sm:h-12 sm:w-12 md:h-14 md:w-14" />
                   <div>
-                    <h2 className="text-lg font-semibold text-gh-fg sm:text-xl">
+                    <h2 className="text-base font-semibold text-gh-fg sm:text-lg md:text-xl">
                       Hi there
                     </h2>
-                    <p className="mt-2 text-xl font-medium text-gh-fg sm:text-2xl md:text-3xl">
+                    <p className="mt-1 text-base font-medium text-gh-fg sm:mt-2 sm:text-xl md:text-2xl">
                       Where should we start?
                     </p>
                   </div>
@@ -110,7 +110,7 @@ export default function ChatThreadPage() {
                 isThinking={sending}
               />
               {!loadingMessages && (
-                <div className="sticky bottom-0 flex-shrink-0 bg-transparent px-2 pt-2 sm:px-4">
+                <div className="sticky bottom-0 flex-shrink-0 bg-transparent px-2 pt-2 pb-[env(safe-area-inset-bottom)] sm:px-4 sm:pb-0">
                   <div className="mx-auto max-w-2xl">
                     <Composer onSend={handleSend} disabled={sending} />
                   </div>

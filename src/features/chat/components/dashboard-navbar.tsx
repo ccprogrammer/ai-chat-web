@@ -25,12 +25,12 @@ export function DashboardNavbar() {
   }, [menuOpen]);
 
   return (
-    <header className="flex h-14 shrink-0 items-center justify-between gap-2 bg-gh-bg px-3 sm:px-4">
-      <div className="flex items-center gap-2">
+    <header className="flex min-h-14 shrink-0 items-center justify-between gap-2 bg-gh-bg px-2 pt-[env(safe-area-inset-top,0px)] sm:px-4 sm:pt-0">
+      <div className="flex items-center gap-1 sm:gap-2">
         <button
           type="button"
           onClick={toggle}
-          className="rounded p-2 text-gh-fg-muted hover:bg-gh-bg-subtle hover:text-gh-fg"
+          className="-m-2 flex min-h-[44px] min-w-[44px] items-center justify-center rounded p-2 text-gh-fg-muted hover:bg-gh-bg-subtle hover:text-gh-fg"
           aria-label="Toggle menu"
         >
           <svg
@@ -53,7 +53,7 @@ export function DashboardNavbar() {
         <button
           type="button"
           onClick={toggleTheme}
-          className="rounded p-2 text-gh-fg-muted hover:bg-gh-bg-subtle hover:text-gh-fg"
+          className="-m-2 flex min-h-[44px] min-w-[44px] items-center justify-center rounded p-2 text-gh-fg-muted hover:bg-gh-bg-subtle hover:text-gh-fg"
           aria-label={theme === "dark" ? "Switch to light" : "Switch to dark"}
         >
           {theme === "dark" ? (
@@ -87,7 +87,7 @@ export function DashboardNavbar() {
           <button
             type="button"
             onClick={() => setMenuOpen((o) => !o)}
-            className="rounded p-2 text-gh-fg-muted hover:bg-gh-bg-subtle hover:text-gh-fg"
+            className="-m-2 flex min-h-[44px] min-w-[44px] items-center justify-center rounded p-2 text-gh-fg-muted hover:bg-gh-bg-subtle hover:text-gh-fg"
             aria-label="Account menu"
             aria-expanded={menuOpen}
             aria-haspopup="true"

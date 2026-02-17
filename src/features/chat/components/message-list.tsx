@@ -25,7 +25,7 @@ export function MessageList({
   }
 
   return (
-    <ul className="flex flex-col gap-4 p-3 sm:p-4">
+    <ul className="flex flex-col gap-4 p-3 pb-[calc(0.75rem+env(safe-area-inset-bottom,0px))] sm:p-4 sm:pb-4">
       {messages.map((msg) => (
         <li
           key={msg.id}

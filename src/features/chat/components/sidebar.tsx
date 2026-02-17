@@ -111,9 +111,9 @@ export function Sidebar({
       />
       <aside
         className={`
-          fixed left-0 top-0 z-50 flex h-full w-64 flex-col overflow-hidden bg-gh-bg-subtle
+          fixed left-0 top-0 z-50 flex h-full w-[min(16rem,85vw)] max-w-64 flex-col overflow-hidden bg-gh-bg-subtle pt-[env(safe-area-inset-top)]
           transition-[transform,width] duration-300 ease-in-out
-          md:relative md:left-auto md:top-auto md:z-auto md:h-full md:w-64
+          md:relative md:left-auto md:top-auto md:z-auto md:h-full md:w-64 md:pt-0
           ${collapsed ? "-translate-x-full md:translate-x-0 md:w-0" : "translate-x-0"}
         `}
       >
@@ -125,7 +125,7 @@ export function Sidebar({
             type="button"
             onClick={onCreateChat}
             disabled={isLoading || createChatDisabled}
-            className="mb-2 flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm text-gh-fg hover:bg-gh-border-muted disabled:opacity-50"
+            className="mb-2 flex min-h-[44px] w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm text-gh-fg hover:bg-gh-border-muted disabled:opacity-50"
           >
             <svg
               className="h-4 w-4 shrink-0"
@@ -218,7 +218,7 @@ export function Sidebar({
                           prev === chat.id ? null : chat.id
                         );
                       }}
-                      className="rounded p-1.5 text-gh-fg-muted opacity-0 hover:bg-gh-border hover:text-gh-fg group-hover:opacity-100"
+                      className="flex min-h-[44px] min-w-[44px] items-center justify-center rounded p-1.5 text-gh-fg-muted opacity-0 hover:bg-gh-border hover:text-gh-fg group-hover:opacity-100 [@media(hover:none)]:opacity-70"
                       aria-label="Chat options"
                       aria-expanded={menuOpenId === chat.id}
                       aria-haspopup="true"
