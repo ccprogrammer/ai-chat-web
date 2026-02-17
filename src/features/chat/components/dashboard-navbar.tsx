@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useRef, useState, useEffect } from "react";
 import { useAuth } from "@/features/auth";
+import { chatCache } from "../cache/chat-cache";
 import { useTheme } from "@/core/components/theme-provider";
 import { useSidebar } from "@/core/context/sidebar-context";
 
@@ -124,6 +125,7 @@ export function DashboardNavbar() {
                 role="menuitem"
                 onClick={() => {
                   setMenuOpen(false);
+                  chatCache.clearAll();
                   logout();
                   router.replace("/");
                 }}

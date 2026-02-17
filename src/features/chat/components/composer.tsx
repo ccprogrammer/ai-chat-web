@@ -61,7 +61,7 @@ export function Composer({ onSend, disabled, embedded }: ComposerProps) {
           }}
           placeholder="Ask anything"
           rows={1}
-          className="min-h-[40px] min-w-0 flex-1 resize-none overflow-y-auto bg-transparent py-2 text-sm leading-5 text-gh-fg placeholder:text-gh-fg-muted focus:outline-none disabled:opacity-50"
+          className="min-h-[40px] min-w-0 flex-1 resize-none overflow-y-auto bg-transparent py-2 text-base leading-5 text-gh-fg placeholder:text-gh-fg-muted focus:outline-none disabled:opacity-50 sm:text-sm"
           disabled={disabled}
           aria-label="Message"
         />

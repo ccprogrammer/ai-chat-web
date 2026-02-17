@@ -11,23 +11,26 @@ import type { Chat } from "@/core/types";
 import { useAuth } from "@/features/auth";
 import { useToast } from "@/core/context/toast-context";
 import { chatRepository } from "../repository/chat.repository";
+import { chatCache } from "../cache/chat-cache";
 
 export function useChats(currentChatId?: string) {
   const { token } = useAuth();
   const router = useRouter();
   const { showError } = useToast();
-  const [chats, setChats] = useState<Chat[]>([]);
+  const [chats, setChats] = useState<Chat[]>(() => chatCache.getChats() ?? []);
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
 
   const refetch = useCallback(async () => {
     if (!token) return;
-    setLoading(true);
+    const cached = chatCache.getChats();
+    if (!cached?.length) setLoading(true);
     try {
       const res = await chatRepository.list(token);
       setChats(res.chats);
+      chatCache.setChats(res.chats);
     } catch (err) {
-      setChats([]);
+      if (!cached?.length) setChats([]);
       showError(err instanceof ApiError ? err.message : "Failed to load chats");
     } finally {
       setLoading(false);
@@ -40,10 +43,14 @@ export function useChats(currentChatId?: string) {
 
   const createChat = useCallback(async () => {
     if (!token) return;
-    setLoading(true);
+    if (!chatCache.getChats()?.length) setLoading(true);
     try {
       const chat = await chatRepository.create(token);
-      setChats((prev) => [chat, ...prev]);
+      setChats((prev) => {
+        const next = [chat, ...prev];
+        chatCache.setChats(next);
+        return next;
+      });
       router.push(`/chat/${chat.id}`);
       return chat;
     } catch (err) {
@@ -59,7 +66,11 @@ export function useChats(currentChatId?: string) {
       setSending(true);
       try {
         const chat = await chatRepository.create(token);
-        setChats((prev) => [chat, ...prev]);
+        setChats((prev) => {
+          const next = [chat, ...prev];
+          chatCache.setChats(next);
+          return next;
+        });
         // Navigate immediately so the chat opens; thread page will send the message
         const params = new URLSearchParams({ send: message });
         router.push(`/chat/${chat.id}?${params.toString()}`);
@@ -79,9 +90,11 @@ export function useChats(currentChatId?: string) {
       if (!token) return;
       try {
         const updated = await chatRepository.update(token, chatId, newTitle);
-        setChats((prev) =>
-          prev.map((c) => (String(c.id) === String(chatId) ? updated : c))
-        );
+        setChats((prev) => {
+          const next = prev.map((c) => (String(c.id) === String(chatId) ? updated : c));
+          chatCache.setChats(next);
+          return next;
+        });
       } catch (err) {
         showError(err instanceof ApiError ? err.message : "Failed to rename chat");
       }
@@ -93,11 +106,19 @@ export function useChats(currentChatId?: string) {
     async (chatId: string) => {
       if (!token) return;
       const deleted = chats.find((c) => String(c.id) === String(chatId));
-      setChats((prev) => prev.filter((c) => String(c.id) !== String(chatId)));
+      setChats((prev) => {
+        const next = prev.filter((c) => String(c.id) !== String(chatId));
+        chatCache.setChats(next);
+        return next;
+      });
       try {
         await chatRepository.delete(token, chatId);
       } catch (err) {
-        if (deleted) setChats((prev) => [deleted, ...prev]);
+        if (deleted) setChats((prev) => {
+          const next = [deleted, ...prev];
+          chatCache.setChats(next);
+          return next;
+        });
         showError(err instanceof ApiError ? err.message : "Failed to delete chat");
       }
       if (String(chatId) === String(currentChatId)) {

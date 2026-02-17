@@ -2,6 +2,8 @@
 
 /**
  * Chat feature: messages state hook (BLoC-like).
+ * Optimistic updates: user message shows immediately, "Thinking..." while API loads.
+ * Uses cache so switching tabs never shows empty during refetch.
  */
 
 import { useCallback, useEffect, useState } from "react";
@@ -10,22 +12,33 @@ import type { Message } from "@/core/types";
 import { useAuth } from "@/features/auth";
 import { useToast } from "@/core/context/toast-context";
 import { chatRepository } from "../repository/chat.repository";
+import { chatCache } from "../cache/chat-cache";
 
 export function useChatMessages(chatId: string | undefined) {
   const { token } = useAuth();
   const { showError } = useToast();
-  const [messages, setMessages] = useState<Message[]>([]);
+  const [messages, setMessages] = useState<Message[]>(() =>
+    chatId ? (chatCache.getMessages(chatId) ?? []) : []
+  );
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
 
   const refetch = useCallback(async () => {
     if (!token || !chatId) return;
-    setLoading(true);
+    const cached = chatCache.getMessages(chatId);
+    if (!cached?.length) setLoading(true);
     try {
       const list = await chatRepository.getMessages(token, chatId);
-      setMessages(list);
+      setMessages((prev) => {
+        if (prev.some((m) => m.id < 0)) return prev;
+        chatCache.setMessages(chatId, list);
+        return list;
+      });
     } catch (err) {
-      setMessages([]);
+      setMessages((prev) => {
+        if (prev.some((m) => m.id < 0)) return prev;
+        return cached?.length ? prev : [];
+      });
       showError(
         err instanceof ApiError ? err.message : "Failed to load messages"
       );
@@ -35,8 +48,12 @@ export function useChatMessages(chatId: string | undefined) {
   }, [token, chatId, showError]);
 
   useEffect(() => {
+    if (!chatId) return;
+    const cached = chatCache.getMessages(chatId);
+    setMessages(cached ?? []);
+    setLoading(!cached?.length);
     refetch();
-  }, [refetch]);
+  }, [chatId, refetch]);
 
   const sendMessage = useCallback(
     async (message: string) => {
@@ -55,16 +72,18 @@ export function useChatMessages(chatId: string | undefined) {
           chat_id: chatId,
           message,
         });
-        setMessages((prev) => [
-          ...prev,
-          {
-            id: -2,
-            chat_id: chatId,
-            role: "assistant",
-            content: res.reply,
-            created_at: new Date().toISOString(),
-          },
-        ]);
+        const assistantMessage: Message = {
+          id: -2,
+          chat_id: chatId,
+          role: "assistant",
+          content: res.reply,
+          created_at: new Date().toISOString(),
+        };
+        setMessages((prev) => {
+          const next = [...prev, assistantMessage];
+          chatCache.setMessages(chatId, next);
+          return next;
+        });
         return res;
       } catch (err) {
         setMessages((prev) => prev.filter((m) => m.id !== -1));
