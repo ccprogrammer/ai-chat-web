@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { useRef, useState, useEffect } from "react";
 import { useSidebar } from "@/core/context/sidebar-context";
 import { useAuth } from "@/features/auth";
+import { Spinner } from "@/core/components/spinner";
 import { SidebarUsers } from "@/features/admin/components/sidebar-users";
 import type { Chat } from "@/core/types";
 
@@ -43,6 +44,7 @@ export function Sidebar({
   const [menuOpenId, setMenuOpenId] = useState<string | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editingTitle, setEditingTitle] = useState("");
+  const [savingId, setSavingId] = useState<string | null>(null);
   const menuRef = useRef<HTMLDivElement>(null);
   const editInputRef = useRef<HTMLInputElement>(null);
 
@@ -80,8 +82,13 @@ export function Sidebar({
       setEditingId(null);
       return;
     }
-    await onRenameChat(chatId, trimmed);
-    setEditingId(null);
+    setSavingId(chatId);
+    try {
+      await onRenameChat(chatId, trimmed);
+      setEditingId(null);
+    } finally {
+      setSavingId(null);
+    }
   };
 
   const handleRenameCancel = () => {
@@ -127,19 +134,23 @@ export function Sidebar({
             disabled={isLoading || createChatDisabled}
             className="mb-2 flex min-h-[44px] w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm text-gh-fg hover:bg-gh-border-muted disabled:opacity-50"
           >
-            <svg
-              className="h-4 w-4 shrink-0"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              aria-hidden
-            >
-              <path d="M12 5v14M5 12h14" />
-            </svg>
-            <span>New chat</span>
+            {isLoading ? (
+              <Spinner className="h-4 w-4 shrink-0" />
+            ) : (
+              <svg
+                className="h-4 w-4 shrink-0"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden
+              >
+                <path d="M12 5v14M5 12h14" />
+              </svg>
+            )}
+            <span>{isLoading ? "Creating…" : "New chat"}</span>
           </button>
           {chats.length === 0 && !isLoading && (
             <p className="px-2 py-4 text-sm text-gh-fg-muted">
@@ -175,14 +186,23 @@ export function Sidebar({
                       <button
                         type="button"
                         onClick={() => handleRenameSave(chat.id)}
-                        className="gh-btn gh-btn-primary flex-1 text-xs"
+                        disabled={savingId === chat.id}
+                        className="gh-btn gh-btn-primary flex flex-1 items-center justify-center gap-1.5 text-xs disabled:opacity-70"
                       >
-                        Save
+                        {savingId === chat.id ? (
+                          <>
+                            <Spinner className="h-3 w-3" />
+                            Saving…
+                          </>
+                        ) : (
+                          "Save"
+                        )}
                       </button>
                       <button
                         type="button"
                         onClick={handleRenameCancel}
-                        className="gh-btn flex-1 text-xs"
+                        disabled={savingId === chat.id}
+                        className="gh-btn flex-1 text-xs disabled:opacity-70"
                       >
                         Cancel
                       </button>

@@ -95,7 +95,7 @@ export default function ChatThreadPage() {
                   </div>
                 </div>
                 <div className="w-full max-w-3xl px-2 sm:px-0">
-                  <Composer onSend={handleSend} disabled={sending} embedded />
+                  <Composer onSend={handleSend} disabled={sending} isSending={sending} embedded />
                 </div>
               </div>
             </div>
@@ -112,7 +112,7 @@ export default function ChatThreadPage() {
               {!loadingMessages && (
                 <div className="sticky bottom-0 flex-shrink-0 bg-transparent px-2 pt-2 pb-[env(safe-area-inset-bottom)] sm:px-4 sm:pb-0">
                   <div className="mx-auto max-w-2xl">
-                    <Composer onSend={handleSend} disabled={sending} />
+                    <Composer onSend={handleSend} disabled={sending} isSending={sending} />
                   </div>
                 </div>
               )}

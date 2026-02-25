@@ -79,6 +79,7 @@ export default function ChatIndexPage() {
                 <Composer
                   onSend={createChatWithFirstMessage}
                   disabled={sending}
+                  isSending={sending}
                   embedded
                 />
               </div>

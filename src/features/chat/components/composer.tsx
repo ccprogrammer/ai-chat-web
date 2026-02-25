@@ -1,15 +1,18 @@
 "use client";
 
 import { useRef, useState, useEffect } from "react";
+import { Spinner } from "@/core/components/spinner";
 
 interface ComposerProps {
   onSend: (message: string) => void;
   disabled?: boolean;
+  /** When true, shows spinner in send button (for sending state) */
+  isSending?: boolean;
   /** When true, no top border or background (for centering below greeting) */
   embedded?: boolean;
 }
 
-export function Composer({ onSend, disabled, embedded }: ComposerProps) {
+export function Composer({ onSend, disabled, isSending, embedded }: ComposerProps) {
   const [text, setText] = useState("");
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -70,19 +73,24 @@ export function Composer({ onSend, disabled, embedded }: ComposerProps) {
           disabled={disabled || !hasText}
           className="flex h-11 min-h-[44px] w-11 min-w-[44px] shrink-0 items-center justify-center rounded-lg text-gh-fg-muted hover:bg-gh-border-muted hover:text-gh-fg focus:outline-none focus:ring-2 focus:ring-gh-accent focus:ring-offset-1 focus:ring-offset-gh-bg-subtle disabled:opacity-50 sm:h-9 sm:w-9 sm:min-h-0 sm:min-w-0"
           aria-label="Send message"
+          aria-busy={isSending}
         >
-          <svg
-            className="h-5 w-5"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <path d="M22 2L11 13" />
-            <path d="M22 2L15 22L11 13L2 9L22 2Z" />
-          </svg>
+          {isSending ? (
+            <Spinner className="h-5 w-5" />
+          ) : (
+            <svg
+              className="h-5 w-5"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M22 2L11 13" />
+              <path d="M22 2L15 22L11 13L2 9L22 2Z" />
+            </svg>
+          )}
         </button>
       </div>
     </form>
