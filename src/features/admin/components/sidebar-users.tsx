@@ -63,7 +63,7 @@ export function SidebarUsers() {
                 <Link
                   href={href}
                   className={`group flex items-center justify-between gap-1 rounded-lg px-3 py-2 text-sm text-gh-fg hover:bg-gh-border-muted ${
-                    isActive ? "bg-gh-border-muted font-medium" : ""
+                    isActive ? "bg-gh-border-muted" : ""
                   }`}
                 >
                   <span className="min-w-0 flex-1 truncate" title={user.email}>

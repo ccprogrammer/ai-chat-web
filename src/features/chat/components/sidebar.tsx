@@ -283,7 +283,7 @@ export function Sidebar({
                     href={href}
                     onClick={handleLinkClick}
                     className={`block rounded-lg px-3 py-2 pr-9 text-sm text-gh-fg hover:bg-gh-border-muted ${
-                      isActive ? "bg-gh-border-muted font-medium" : ""
+                      isActive ? "bg-gh-border-muted" : ""
                     }`}
                   >
                     <span className="block truncate">{title}</span>
