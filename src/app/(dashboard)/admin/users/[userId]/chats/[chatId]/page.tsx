@@ -41,15 +41,6 @@ export default function AdminUserChatMessagesPage() {
         <DashboardNavbar />
         <main className="flex min-w-0 flex-1 flex-col overflow-hidden">
           <div className="flex flex-1 flex-col overflow-y-auto">
-            <div className="p-4">
-              <button
-                type="button"
-                onClick={() => router.back()}
-                className="mb-4 inline-flex items-center gap-1 text-sm text-gh-accent hover:underline"
-              >
-                ← Back
-              </button>
-            </div>
             <MessageList
               messages={messages}
               isLoading={loadingMessages && messages.length === 0}
