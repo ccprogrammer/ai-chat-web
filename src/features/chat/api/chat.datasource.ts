@@ -36,7 +36,7 @@ export const chatDatasource = {
   sendMessage: (
     token: string,
     payload: {
-      chat_id: string;
+      chat_id?: string;
       message: string;
       model?: AIModel;
     }
@@ -45,7 +45,7 @@ export const chatDatasource = {
       method: "POST",
       token,
       body: JSON.stringify({
-        chat_id: payload.chat_id,
+        ...(payload.chat_id != null && { chat_id: payload.chat_id }),
         message: payload.message,
         model: payload.model ?? "fast",
       }),

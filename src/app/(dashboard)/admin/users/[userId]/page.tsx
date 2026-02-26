@@ -27,8 +27,6 @@ export default function AdminUserChatsPage() {
   const {
     chats: myChats,
     loading: loadingMyChats,
-    sending: creatingChat,
-    createChat,
     renameChat,
     deleteChat,
   } = useChats();
@@ -42,12 +40,11 @@ export default function AdminUserChatsPage() {
     <div className="flex h-screen min-h-0 w-full items-stretch overflow-hidden">
       <Sidebar
         chats={myChats}
-        onCreateChat={createChat}
+        onNewChat={() => router.push("/chat")}
         onRenameChat={renameChat}
         onDeleteChat={handleDeleteChat}
         canDeleteChat={() => true}
         isLoading={loadingMyChats}
-        isCreating={creatingChat}
       />
       <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
         <DashboardNavbar />

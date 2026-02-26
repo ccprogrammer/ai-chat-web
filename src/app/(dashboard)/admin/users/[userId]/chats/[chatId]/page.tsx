@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import {
   useChats,
   Sidebar,
@@ -12,14 +12,13 @@ import { useAdminChatMessages } from "@/features/admin";
 
 export default function AdminUserChatMessagesPage() {
   const params = useParams();
+  const router = useRouter();
   const userId = params.userId as string;
   const chatId = params.chatId as string;
 
   const {
     chats,
     loading,
-    sending: creatingChat,
-    createChat,
     renameChat,
     deleteChat,
   } = useChats();
@@ -33,12 +32,11 @@ export default function AdminUserChatMessagesPage() {
     <div className="flex h-screen min-h-0 w-full items-stretch overflow-hidden">
       <Sidebar
         chats={chats}
-        onCreateChat={createChat}
+        onNewChat={() => router.push("/chat")}
         onRenameChat={renameChat}
         onDeleteChat={handleDeleteChat}
         canDeleteChat={() => true}
         isLoading={loading}
-        isCreating={creatingChat}
       />
       <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
         <DashboardNavbar />

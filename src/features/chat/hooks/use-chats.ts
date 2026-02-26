@@ -62,29 +62,25 @@ export function useChats(currentChatId?: string) {
     }
   }, [token, router, showError]);
 
-  const createChatWithFirstMessage = useCallback(
+  const sendMessageFromNewChat = useCallback(
     async (message: string) => {
       if (!token) return;
       setSending(true);
       try {
-        const chat = await chatRepository.create(token);
-        setChats((prev) => {
-          const next = [chat, ...prev];
-          chatCache.setChats(next);
-          return next;
-        });
-        // Navigate immediately so the chat opens; thread page will send the message
-        const params = new URLSearchParams({ send: message });
-        router.push(`/chat/${chat.id}?${params.toString()}`);
+        const res = await chatRepository.sendMessage(token, { message });
+        await refetch();
+        router.push(`/chat/${res.chat_id}`);
+        return res;
       } catch (err) {
         showError(
           err instanceof ApiError ? err.message : "Something went wrong"
         );
+        throw err;
       } finally {
         setSending(false);
       }
     },
-    [token, router, showError]
+    [token, router, showError, refetch]
   );
 
   const renameChat = useCallback(
@@ -136,7 +132,7 @@ export function useChats(currentChatId?: string) {
     sending,
     refetch,
     createChat,
-    createChatWithFirstMessage,
+    sendMessageFromNewChat,
     renameChat,
     deleteChat,
   };

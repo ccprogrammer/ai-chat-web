@@ -1,7 +1,7 @@
 "use client";
 
-import { useParams, useSearchParams, useRouter } from "next/navigation";
-import { useLayoutEffect, useRef, useEffect } from "react";
+import { useParams, useRouter } from "next/navigation";
+import { useLayoutEffect, useRef } from "react";
 import {
   useChats,
   useChatMessages,
@@ -13,7 +13,6 @@ import {
 
 export default function ChatThreadPage() {
   const params = useParams();
-  const searchParams = useSearchParams();
   const router = useRouter();
   const id = params.id as string;
   const scrollContainerRef = useRef<HTMLDivElement>(null);
@@ -21,9 +20,7 @@ export default function ChatThreadPage() {
   const {
     chats,
     loading: loadingChats,
-    sending: creatingChat,
     refetch: refetchChats,
-    createChat,
     renameChat,
     deleteChat,
   } = useChats(id);
@@ -34,18 +31,6 @@ export default function ChatThreadPage() {
     sending,
     sendMessage,
   } = useChatMessages(id);
-
-  const pendingSentRef = useRef(false);
-  useEffect(() => {
-    const pending = searchParams.get("send");
-    if (!id || !pending || pendingSentRef.current) return;
-    pendingSentRef.current = true;
-    router.replace(`/chat/${id}`, { scroll: false });
-    (async () => {
-      const res = await sendMessage(pending);
-      if (res) refetchChats();
-    })();
-  }, [id, searchParams, router, sendMessage, refetchChats]);
 
   const handleSend = async (message: string) => {
     const res = await sendMessage(message);
@@ -58,26 +43,17 @@ export default function ChatThreadPage() {
     el.scrollTop = el.scrollHeight - el.clientHeight;
   }, [messages.length, loadingMessages, sending]);
 
-  const hasEmptyNewChat = chats.some(
-    (c) =>
-      c.message_count === 0 &&
-      (!c.title ||
-        c.title.trim() === "" ||
-        c.title.trim().toLowerCase() === "new chat")
-  );
-
   const isEmpty = messages.length === 0 && !loadingMessages;
 
   return (
     <div className="flex h-mobile-screen w-full min-w-0 items-stretch overflow-hidden">
       <Sidebar
         chats={chats}
-        onCreateChat={() => !hasEmptyNewChat && createChat()}
+        onNewChat={() => router.push("/chat")}
         onRenameChat={renameChat}
         onDeleteChat={deleteChat}
         canDeleteChat={() => true}
         isLoading={loadingChats}
-        isCreating={creatingChat}
       />
       <div className="relative flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
         <DashboardNavbar />

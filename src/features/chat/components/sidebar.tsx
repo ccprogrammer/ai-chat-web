@@ -11,13 +11,12 @@ import type { Chat } from "@/core/types";
 
 interface SidebarProps {
   chats: Chat[];
-  onCreateChat: () => void;
+  /** Called when "+ New chat" is clicked. Typically navigates to /chat. */
+  onNewChat: () => void;
   onRenameChat?: (id: string, newTitle: string) => void | Promise<void>;
   onDeleteChat?: (id: string) => void | Promise<void>;
   canDeleteChat?: (chat: Chat) => boolean;
   isLoading?: boolean;
-  isCreating?: boolean;
-  createChatDisabled?: boolean;
 }
 
 function formatDate(iso: string) {
@@ -32,13 +31,11 @@ function formatDate(iso: string) {
 
 export function Sidebar({
   chats,
-  onCreateChat,
+  onNewChat,
   onRenameChat,
   onDeleteChat,
   canDeleteChat,
   isLoading,
-  isCreating,
-  createChatDisabled,
 }: SidebarProps) {
   const pathname = usePathname();
   const { isAdmin } = useAuth();
@@ -132,14 +129,10 @@ export function Sidebar({
         <nav className="flex-1 overflow-y-auto p-1.5 sm:p-2">
           <button
             type="button"
-            onClick={onCreateChat}
-            disabled={isCreating || createChatDisabled}
-            className="mb-2 flex min-h-[44px] w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm text-gh-fg hover:bg-gh-border-muted disabled:opacity-50"
+            onClick={onNewChat}
+            className="mb-2 flex min-h-[44px] w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm text-gh-fg hover:bg-gh-border-muted"
           >
-            {isCreating ? (
-              <Spinner className="h-4 w-4 shrink-0" />
-            ) : (
-              <svg
+            <svg
                 className="h-4 w-4 shrink-0"
                 viewBox="0 0 24 24"
                 fill="none"
@@ -151,8 +144,7 @@ export function Sidebar({
               >
                 <path d="M12 5v14M5 12h14" />
               </svg>
-            )}
-            <span>{isCreating ? "Creating…" : "+ New chat"}</span>
+            <span>+ New chat</span>
           </button>
           {chats.length === 0 && !isLoading && (
             <p className="px-2 py-4 text-sm text-gh-fg-muted">
