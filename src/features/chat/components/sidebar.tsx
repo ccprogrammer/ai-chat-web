@@ -348,13 +348,13 @@ export function Sidebar({
           {isAdmin && <SidebarUsers />}
           </div>
         </nav>
-        {/* Footer: theme & user - always visible, bottom of sidebar */}
+        {/* Footer: each row = icon + text, icons fixed, text fades */}
         <div className="flex shrink-0 flex-col gap-0.5 py-1.5 pb-[max(0.5rem,env(safe-area-inset-bottom))]">
-          <div className={`flex items-center ${collapsed ? "justify-center" : "gap-2 pl-2"}`}>
+          <div className="flex min-h-[36px] items-center gap-2">
             <button
               type="button"
               onClick={toggleTheme}
-              className="flex min-h-[36px] min-w-[36px] shrink-0 items-center justify-center rounded p-1.5 text-gh-fg-muted hover:bg-gh-border-muted hover:text-gh-fg"
+              className="flex h-9 w-9 shrink-0 items-center justify-center rounded p-1.5 text-gh-fg-muted hover:bg-gh-border-muted hover:text-gh-fg"
               aria-label={theme === "dark" ? "Switch to light" : "Switch to dark"}
             >
               {theme === "dark" ? (
@@ -368,14 +368,20 @@ export function Sidebar({
                 </svg>
               )}
             </button>
-            {!collapsed && <span className="text-xs text-gh-fg-muted">Theme</span>}
+            <span
+              className={`min-w-0 overflow-hidden text-xs text-gh-fg-muted transition-opacity duration-300 ease-out ${
+                collapsed ? "pointer-events-none opacity-0" : "opacity-100"
+              }`}
+            >
+              Theme
+            </span>
           </div>
-          <div className={`flex items-center ${collapsed ? "justify-center" : "gap-2 pl-2"}`}>
-            <div className="relative" ref={userMenuRef}>
+          <div className="flex min-h-[36px] items-center gap-2">
+            <div className="relative shrink-0" ref={userMenuRef}>
               <button
                 type="button"
                 onClick={() => setUserMenuOpen((o) => !o)}
-                className="flex min-h-[36px] min-w-[36px] shrink-0 items-center justify-center rounded p-1.5 text-gh-fg-muted hover:bg-gh-border-muted hover:text-gh-fg"
+                className="flex h-9 w-9 items-center justify-center rounded p-1.5 text-gh-fg-muted hover:bg-gh-border-muted hover:text-gh-fg"
                 aria-label="Account menu"
                 aria-expanded={userMenuOpen}
                 aria-haspopup="true"
@@ -412,7 +418,13 @@ export function Sidebar({
                 </div>
               )}
             </div>
-            {!collapsed && <span className="text-xs text-gh-fg-muted">Account</span>}
+            <span
+              className={`min-w-0 overflow-hidden text-xs text-gh-fg-muted transition-opacity duration-300 ease-out ${
+                collapsed ? "pointer-events-none opacity-0" : "opacity-100"
+              }`}
+            >
+              Account
+            </span>
           </div>
         </div>
       </aside>
