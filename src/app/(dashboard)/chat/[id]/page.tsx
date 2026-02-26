@@ -102,18 +102,20 @@ export default function ChatThreadPage() {
               </div>
             </div>
           ) : (
-            <div
-              ref={scrollContainerRef}
-              className="flex min-h-0 flex-1 flex-col overflow-y-auto"
-            >
-              <MessageList
-                messages={messages}
-                isLoading={loadingMessages && messages.length === 0}
-                isThinking={sending}
-              />
+            <div className="relative flex min-h-0 flex-1 flex-col overflow-hidden">
+              <div
+                ref={scrollContainerRef}
+                className="min-h-0 flex-1 overflow-y-auto pb-24"
+              >
+                <MessageList
+                  messages={messages}
+                  isLoading={loadingMessages && messages.length === 0}
+                  isThinking={sending}
+                />
+              </div>
               {!loadingMessages && (
-                <div className="sticky bottom-0 flex-shrink-0 bg-transparent px-2 pt-2 pb-[env(safe-area-inset-bottom)] sm:px-4 sm:pb-0">
-                  <div className="mx-auto max-w-2xl">
+                <div className="absolute bottom-0 left-0 right-0 flex justify-center bg-transparent px-2 pt-2 pb-[env(safe-area-inset-bottom)] sm:px-4 sm:pb-0">
+                  <div className="mx-auto w-full max-w-2xl">
                     <Composer onSend={handleSend} disabled={sending} isSending={sending} />
                   </div>
                 </div>
