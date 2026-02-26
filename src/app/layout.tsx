@@ -3,6 +3,7 @@ import "./globals.css";
 import { AuthProvider } from "@/features/auth";
 import { ToastProvider } from "@/core/context/toast-context";
 import { ThemeProvider } from "@/core/components/theme-provider";
+import { SessionExpiredPopup } from "@/core/components/session-expired-popup";
 
 export const metadata: Metadata = {
   title: "AI Chat",
@@ -25,7 +26,10 @@ export default function RootLayout({
       <body className="min-h-screen bg-gh-bg text-gh-fg">
         <ThemeProvider>
           <AuthProvider>
-            <ToastProvider>{children}</ToastProvider>
+            <ToastProvider>
+              {children}
+              <SessionExpiredPopup />
+            </ToastProvider>
           </AuthProvider>
         </ThemeProvider>
       </body>

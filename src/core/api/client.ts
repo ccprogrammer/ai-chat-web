@@ -1,10 +1,14 @@
 /**
  * Core API client: HTTP primitives shared by all features.
- * Handles base URL, auth headers, 401 redirect, logging.
+ * Handles base URL, auth headers, 401 session-expired event, logging.
  */
+
+import { TOKEN_KEY, EMAIL_KEY, ROLE_KEY } from "@/core/constants/storage";
 
 const getBaseUrl = () =>
   process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+
+export const SESSION_EXPIRED_EVENT = "session-expired";
 
 export class ApiError extends Error {
   constructor(
@@ -49,9 +53,10 @@ export async function request<T>(
 
   if (!res.ok) {
     if (res.status === 401 && typeof window !== "undefined") {
-      localStorage.removeItem("ai_chat_token");
-      localStorage.removeItem("ai_chat_email");
-      localStorage.removeItem("ai_chat_role");
+      localStorage.removeItem(TOKEN_KEY);
+      localStorage.removeItem(EMAIL_KEY);
+      localStorage.removeItem(ROLE_KEY);
+      window.dispatchEvent(new CustomEvent(SESSION_EXPIRED_EVENT));
     }
     const msg =
       typeof body === "object" && body !== null && "detail" in body
