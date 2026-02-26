@@ -1,10 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useRef, useState, useEffect } from "react";
 import { useSidebar } from "@/core/context/sidebar-context";
 import { useAuth } from "@/features/auth";
+import { useTheme } from "@/core/components/theme-provider";
+import { chatCache } from "../cache/chat-cache";
 import { Spinner } from "@/core/components/spinner";
 import { SidebarUsers } from "@/features/admin/components/sidebar-users";
 import type { Chat } from "@/core/types";
@@ -38,9 +40,13 @@ export function Sidebar({
   isLoading,
 }: SidebarProps) {
   const pathname = usePathname();
-  const { isAdmin } = useAuth();
+  const router = useRouter();
+  const { isAdmin, logout, email } = useAuth();
+  const { theme, toggleTheme } = useTheme();
   const { collapsed, toggle, close } = useSidebar();
   const [menuOpenId, setMenuOpenId] = useState<string | null>(null);
+  const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const userMenuRef = useRef<HTMLDivElement>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editingTitle, setEditingTitle] = useState("");
   const [savingId, setSavingId] = useState<string | null>(null);
@@ -64,6 +70,16 @@ export function Sidebar({
     document.addEventListener("click", closeMenu);
     return () => document.removeEventListener("click", closeMenu);
   }, [menuOpenId]);
+
+  useEffect(() => {
+    if (!userMenuOpen) return;
+    const closeUserMenu = (e: MouseEvent) => {
+      if (userMenuRef.current?.contains(e.target as Node)) return;
+      setUserMenuOpen(false);
+    };
+    document.addEventListener("click", closeUserMenu);
+    return () => document.removeEventListener("click", closeUserMenu);
+  }, [userMenuOpen]);
 
   useEffect(() => {
     if (editingId) editInputRef.current?.focus();
@@ -107,7 +123,7 @@ export function Sidebar({
   return (
     <div
       className={`flex h-full min-h-0 shrink-0 flex-col overflow-hidden transition-[width] duration-300 ease-in-out ${
-        collapsed ? "w-16 md:w-16" : "w-16 md:w-64"
+        collapsed ? "w-12 md:w-12" : "w-12 md:w-64"
       }`}
     >
       <div
@@ -122,22 +138,22 @@ export function Sidebar({
           fixed left-0 top-0 z-50 flex h-full flex-col overflow-hidden bg-gh-bg-subtle pt-[env(safe-area-inset-top)]
           transition-[width] duration-300 ease-in-out
           md:relative md:left-auto md:top-auto md:z-20 md:pt-0
-          ${collapsed ? "w-16 md:w-16" : "w-[min(16rem,85vw)] max-w-64 md:w-64"}
+          ${collapsed ? "w-12 md:w-12" : "w-[min(16rem,85vw)] max-w-64 md:w-64"}
         `}
       >
-        {/* Chevron in fixed 64px strip - never moves during open/close */}
+        {/* Chevron in fixed 48px strip - never moves during open/close */}
         <div className="flex shrink-0 flex-row">
-          <div className="flex w-16 shrink-0 flex-col items-center py-1.5">
+          <div className="flex w-12 shrink-0 flex-col items-center py-1">
             <button
             type="button"
             onClick={toggle}
-            className="flex min-h-[44px] min-w-[44px] items-center justify-center rounded p-2 text-gh-fg-muted hover:bg-gh-border-muted hover:text-gh-fg"
+            className="flex min-h-[36px] min-w-[36px] items-center justify-center rounded p-1.5 text-gh-fg-muted hover:bg-gh-border-muted hover:text-gh-fg"
             aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
           >
             {collapsed ? (
               <svg
-                width="20"
-                height="20"
+                width="18"
+                height="18"
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="currentColor"
@@ -149,8 +165,8 @@ export function Sidebar({
               </svg>
             ) : (
               <svg
-                width="20"
-                height="20"
+                width="18"
+                height="18"
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="currentColor"
@@ -166,7 +182,7 @@ export function Sidebar({
           {/* Spacer when expanded - chevron strip stays fixed, this grows */}
           {!collapsed && <div className="min-w-0 flex-1" />}
         </div>
-        {/* Fixed-width content prevents text reflow/folding; mask reveals left-to-right */}
+        {/* Fixed-width content prevents text reflow/folding; mask reveals left-to-right (strip 48px, content 208px) */}
         <nav
           className={`min-h-0 flex-1 overflow-x-hidden overflow-y-auto
             [mask-image:linear-gradient(to_right,black_50%,transparent_50%)] [mask-size:200%_100%] [mask-repeat:no-repeat]
@@ -176,7 +192,7 @@ export function Sidebar({
               : "opacity-100 [mask-position:0_0] delay-0"
           }`}
         >
-          <div className="w-48 shrink-0 pl-2 pr-2 py-1.5 pt-0 sm:pl-3 sm:pr-3 sm:py-2 sm:pt-0">
+          <div className="w-52 shrink-0 pl-2 pr-2 py-1.5 pt-0 sm:pr-3 sm:py-2 sm:pt-0">
               <button
                 type="button"
                 onClick={onNewChat}
@@ -332,6 +348,73 @@ export function Sidebar({
           {isAdmin && <SidebarUsers />}
           </div>
         </nav>
+        {/* Footer: theme & user - always visible, bottom of sidebar */}
+        <div className="flex shrink-0 flex-col gap-0.5 py-1.5 pb-[max(0.5rem,env(safe-area-inset-bottom))]">
+          <div className={`flex items-center ${collapsed ? "justify-center" : "gap-2 pl-2"}`}>
+            <button
+              type="button"
+              onClick={toggleTheme}
+              className="flex min-h-[36px] min-w-[36px] shrink-0 items-center justify-center rounded p-1.5 text-gh-fg-muted hover:bg-gh-border-muted hover:text-gh-fg"
+              aria-label={theme === "dark" ? "Switch to light" : "Switch to dark"}
+            >
+              {theme === "dark" ? (
+                <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <circle cx="12" cy="12" r="5" />
+                  <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" />
+                </svg>
+              ) : (
+                <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+                </svg>
+              )}
+            </button>
+            {!collapsed && <span className="text-xs text-gh-fg-muted">Theme</span>}
+          </div>
+          <div className={`flex items-center ${collapsed ? "justify-center" : "gap-2 pl-2"}`}>
+            <div className="relative" ref={userMenuRef}>
+              <button
+                type="button"
+                onClick={() => setUserMenuOpen((o) => !o)}
+                className="flex min-h-[36px] min-w-[36px] shrink-0 items-center justify-center rounded p-1.5 text-gh-fg-muted hover:bg-gh-border-muted hover:text-gh-fg"
+                aria-label="Account menu"
+                aria-expanded={userMenuOpen}
+                aria-haspopup="true"
+              >
+                <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                  <circle cx="12" cy="7" r="4" />
+                </svg>
+              </button>
+              {userMenuOpen && (
+                <div
+                  className="absolute bottom-full left-0 z-20 mb-1 min-w-[200px] rounded-lg border border-gh-border bg-gh-bg py-2 shadow-lg"
+                  role="menu"
+                >
+                  <div className="px-3 py-2">
+                    <p className="text-xs font-medium text-gh-fg-muted">Email</p>
+                    <p className="truncate text-sm text-gh-fg" title={email ?? undefined}>
+                      {email ?? "—"}
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    role="menuitem"
+                    onClick={() => {
+                      setUserMenuOpen(false);
+                      chatCache.clearAll();
+                      logout();
+                      router.replace("/");
+                    }}
+                    className="w-full px-3 py-2 text-left text-sm text-gh-danger hover:bg-gh-bg-subtle"
+                  >
+                    Sign out
+                  </button>
+                </div>
+              )}
+            </div>
+            {!collapsed && <span className="text-xs text-gh-fg-muted">Account</span>}
+          </div>
+        </div>
       </aside>
     </div>
   );
