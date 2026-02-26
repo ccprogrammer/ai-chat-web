@@ -43,6 +43,7 @@ export function useChats(currentChatId?: string) {
 
   const createChat = useCallback(async () => {
     if (!token) return;
+    setSending(true);
     if (!chatCache.getChats()?.length) setLoading(true);
     try {
       const chat = await chatRepository.create(token);
@@ -57,6 +58,7 @@ export function useChats(currentChatId?: string) {
       showError(err instanceof ApiError ? err.message : "Failed to create chat");
     } finally {
       setLoading(false);
+      setSending(false);
     }
   }, [token, router, showError]);
 

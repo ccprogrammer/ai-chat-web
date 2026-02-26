@@ -21,6 +21,7 @@ export default function ChatThreadPage() {
   const {
     chats,
     loading: loadingChats,
+    sending: creatingChat,
     refetch: refetchChats,
     createChat,
     renameChat,
@@ -76,6 +77,7 @@ export default function ChatThreadPage() {
         onDeleteChat={deleteChat}
         canDeleteChat={() => true}
         isLoading={loadingChats}
+        isCreating={creatingChat}
       />
       <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
         <DashboardNavbar />

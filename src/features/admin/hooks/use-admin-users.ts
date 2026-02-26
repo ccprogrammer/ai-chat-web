@@ -10,21 +10,24 @@ import type { User } from "@/core/types";
 import { useAuth } from "@/features/auth";
 import { useToast } from "@/core/context/toast-context";
 import { adminRepository } from "../repository/admin.repository";
+import { adminCache } from "../cache/admin-cache";
 
 export function useAdminUsers() {
   const { token } = useAuth();
   const { showError } = useToast();
-  const [users, setUsers] = useState<User[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [users, setUsers] = useState<User[]>(() => adminCache.getUsers() ?? []);
+  const [loading, setLoading] = useState(!adminCache.getUsers());
 
   const refetch = useCallback(async () => {
     if (!token) return;
-    setLoading(true);
+    const cached = adminCache.getUsers();
+    if (!cached?.length) setLoading(true);
     try {
       const list = await adminRepository.listUsers(token);
       setUsers(list);
+      adminCache.setUsers(list);
     } catch (err) {
-      setUsers([]);
+      setUsers((prev) => (cached?.length ? prev : []));
       showError(err instanceof ApiError ? err.message : "Failed to load users");
     } finally {
       setLoading(false);
@@ -32,6 +35,9 @@ export function useAdminUsers() {
   }, [token, showError]);
 
   useEffect(() => {
+    const cached = adminCache.getUsers();
+    setUsers(cached ?? []);
+    setLoading(!cached?.length);
     refetch();
   }, [refetch]);
 

@@ -18,6 +18,7 @@ export default function AdminUserChatMessagesPage() {
   const {
     chats,
     loading,
+    sending: creatingChat,
     createChat,
     renameChat,
     deleteChat,
@@ -37,6 +38,7 @@ export default function AdminUserChatMessagesPage() {
         onDeleteChat={handleDeleteChat}
         canDeleteChat={() => true}
         isLoading={loading}
+        isCreating={creatingChat}
       />
       <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
         <DashboardNavbar />

@@ -47,7 +47,7 @@ export function MessageList({
           </div>
         </li>
       ))}
-      {(isLoading || isThinking) && (
+      {isThinking && (
         <li className="flex justify-start">
           <div className="px-3 py-2.5 sm:px-4 sm:py-3">
             <span className="text-gh-fg-muted">Thinking…</span>

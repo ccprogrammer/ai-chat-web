@@ -16,6 +16,7 @@ interface SidebarProps {
   onDeleteChat?: (id: string) => void | Promise<void>;
   canDeleteChat?: (chat: Chat) => boolean;
   isLoading?: boolean;
+  isCreating?: boolean;
   createChatDisabled?: boolean;
 }
 
@@ -36,6 +37,7 @@ export function Sidebar({
   onDeleteChat,
   canDeleteChat,
   isLoading,
+  isCreating,
   createChatDisabled,
 }: SidebarProps) {
   const pathname = usePathname();
@@ -131,10 +133,10 @@ export function Sidebar({
           <button
             type="button"
             onClick={onCreateChat}
-            disabled={isLoading || createChatDisabled}
+            disabled={isCreating || createChatDisabled}
             className="mb-2 flex min-h-[44px] w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm text-gh-fg hover:bg-gh-border-muted disabled:opacity-50"
           >
-            {isLoading ? (
+            {isCreating ? (
               <Spinner className="h-4 w-4 shrink-0" />
             ) : (
               <svg
@@ -150,7 +152,7 @@ export function Sidebar({
                 <path d="M12 5v14M5 12h14" />
               </svg>
             )}
-            <span>{isLoading ? "Creating…" : "New chat"}</span>
+            <span>{isCreating ? "Creating…" : "+ New chat"}</span>
           </button>
           {chats.length === 0 && !isLoading && (
             <p className="px-2 py-4 text-sm text-gh-fg-muted">

@@ -57,6 +57,7 @@ export default function ChatIndexPage() {
         onDeleteChat={handleDeleteChat}
         canDeleteChat={() => true}
         isLoading={loading}
+        isCreating={sending}
         createChatDisabled={chats.length === 0}
       />
       <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
