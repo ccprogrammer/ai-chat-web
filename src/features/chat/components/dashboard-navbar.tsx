@@ -26,7 +26,7 @@ export function DashboardNavbar() {
   }, [menuOpen]);
 
   return (
-    <header className="flex min-h-14 shrink-0 items-center justify-between gap-2 bg-gh-bg px-2 pt-[env(safe-area-inset-top,0px)] sm:px-4 sm:pt-0">
+    <header className="flex min-h-14 shrink-0 items-center justify-between gap-2 bg-gh-bg px-2 pt-[env(safe-area-inset-top,0px)] sm:px-4 sm:pt-0 md:absolute md:left-0 md:right-0 md:top-0 md:z-10 md:bg-transparent">
       <div className="flex items-center gap-1 sm:gap-2">
         <button
           type="button"

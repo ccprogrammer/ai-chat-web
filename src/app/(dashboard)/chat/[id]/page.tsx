@@ -79,9 +79,9 @@ export default function ChatThreadPage() {
         isLoading={loadingChats}
         isCreating={creatingChat}
       />
-      <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
+      <div className="relative flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
         <DashboardNavbar />
-        <main className="flex min-w-0 flex-1 flex-col overflow-hidden">
+        <main className="flex min-w-0 flex-1 flex-col overflow-hidden md:pt-0">
           {isEmpty ? (
             <div className="flex flex-1 flex-col items-center justify-center px-3 py-4 sm:py-8 sm:px-4 sm:py-12">
               <div className="flex w-full max-w-2xl flex-col items-center gap-4 sm:gap-6 md:gap-8">
@@ -105,7 +105,7 @@ export default function ChatThreadPage() {
             <div className="relative flex min-h-0 flex-1 flex-col overflow-hidden">
               <div
                 ref={scrollContainerRef}
-                className="min-h-0 flex-1 overflow-y-auto pb-24"
+                className="min-h-0 flex-1 overflow-y-auto pb-24 md:pt-14 md:px-12 lg:px-16 xl:px-24"
               >
                 <MessageList
                   messages={messages}
