@@ -107,7 +107,7 @@ export function Sidebar({
   return (
     <div
       className={`flex h-full min-h-0 shrink-0 flex-col overflow-hidden transition-[width] duration-300 ease-in-out ${
-        collapsed ? "w-16 md:w-16 delay-150" : "w-16 md:w-64 delay-0"
+        collapsed ? "w-16 md:w-16" : "w-16 md:w-64"
       }`}
     >
       <div
@@ -122,7 +122,7 @@ export function Sidebar({
           fixed left-0 top-0 z-50 flex h-full flex-col overflow-hidden bg-gh-bg-subtle pt-[env(safe-area-inset-top)]
           transition-[width] duration-300 ease-in-out
           md:relative md:left-auto md:top-auto md:z-20 md:pt-0
-          ${collapsed ? "w-16 md:w-16 delay-150" : "w-[min(16rem,85vw)] max-w-64 md:w-64 delay-0"}
+          ${collapsed ? "w-16 md:w-16" : "w-[min(16rem,85vw)] max-w-64 md:w-64"}
         `}
       >
         {/* Chevron in fixed 64px strip - never moves during open/close */}
