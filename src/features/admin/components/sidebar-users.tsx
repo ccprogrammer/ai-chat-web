@@ -30,7 +30,7 @@ export function SidebarUsers() {
   };
 
   return (
-    <div className="mt-4 border-t border-gh-border pt-4">
+    <div className="mt-4 pt-4">
       <div className="mb-2 px-2 text-xs font-medium text-gh-fg-muted">
         Users
       </div>
@@ -40,7 +40,9 @@ export function SidebarUsers() {
         <p className="px-2 py-2 text-sm text-gh-fg-muted">No users yet.</p>
       ) : (
         <ul className="space-y-0.5">
-          {users.map((user) => {
+          {users
+            .filter((user) => user.email !== currentEmail)
+            .map((user) => {
             const href = `/admin/users/${user.id}`;
             const isActive = pathname === href;
             const role = user.role === "admin" ? "admin" : "user";
@@ -59,16 +61,14 @@ export function SidebarUsers() {
                   <span className="shrink-0 text-xs text-gh-fg-muted">
                     {role}
                   </span>
-                  {!(user.email === currentEmail && role === "admin") && (
-                    <button
-                      type="button"
-                      onClick={(e) => handleMakeAdmin(e, user.id, user.role)}
-                      className="shrink-0 rounded px-1.5 py-0.5 text-xs text-gh-accent hover:bg-gh-border-muted"
-                      title={role === "admin" ? "Demote to user" : "Make admin"}
-                    >
-                      {role === "admin" ? "Demote" : "Make admin"}
-                    </button>
-                  )}
+                  <button
+                    type="button"
+                    onClick={(e) => handleMakeAdmin(e, user.id, user.role)}
+                    className="shrink-0 rounded px-1.5 py-0.5 text-xs text-gh-accent hover:bg-gh-border-muted"
+                    title={role === "admin" ? "Demote to user" : "Make admin"}
+                  >
+                    {role === "admin" ? "Demote" : "Make admin"}
+                  </button>
                 </Link>
               </li>
             );

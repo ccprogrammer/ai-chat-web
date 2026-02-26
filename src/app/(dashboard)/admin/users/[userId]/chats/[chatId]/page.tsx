@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import {
   useChats,
@@ -43,12 +42,13 @@ export default function AdminUserChatMessagesPage() {
         <main className="flex min-w-0 flex-1 flex-col overflow-hidden">
           <div className="flex flex-1 flex-col overflow-y-auto">
             <div className="p-4">
-              <Link
-                href={`/admin/users/${userId}`}
+              <button
+                type="button"
+                onClick={() => router.back()}
                 className="mb-4 inline-flex items-center gap-1 text-sm text-gh-accent hover:underline"
               >
                 ← Back
-              </Link>
+              </button>
             </div>
             <MessageList
               messages={messages}

@@ -51,12 +51,6 @@ export default function AdminUserChatsPage() {
         <main className="flex min-w-0 flex-1 flex-col overflow-hidden">
           <div className="flex flex-1 flex-col overflow-y-auto p-4">
             <div className="max-w-2xl">
-              <Link
-                href="/chat"
-                className="mb-4 inline-flex items-center gap-1 text-sm text-gh-accent hover:underline"
-              >
-                ← Back
-              </Link>
               <h1 className="mb-4 text-lg font-semibold text-gh-fg">
                 User&apos;s chats
               </h1>

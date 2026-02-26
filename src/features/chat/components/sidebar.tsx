@@ -349,7 +349,7 @@ export function Sidebar({
           </div>
         </nav>
         {/* Footer: each row = icon + text, icons fixed, text fades */}
-        <div className="flex shrink-0 flex-col gap-0.5 py-1.5 pb-[max(0.5rem,env(safe-area-inset-bottom))]">
+        <div className="flex shrink-0 flex-col gap-0.5 pl-2 pr-2 py-1.5 pb-[max(0.5rem,env(safe-area-inset-bottom))] sm:pr-3">
           <div className="flex min-h-[36px] items-center gap-2">
             <button
               type="button"
