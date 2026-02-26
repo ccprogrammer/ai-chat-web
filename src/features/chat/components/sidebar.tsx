@@ -107,7 +107,7 @@ export function Sidebar({
   return (
     <div
       className={`flex h-full min-h-0 shrink-0 flex-col overflow-hidden transition-[width] duration-300 ease-in-out ${
-        collapsed ? "w-16 md:w-16 delay-100" : "w-16 md:w-64 delay-0"
+        collapsed ? "w-16 md:w-16 delay-150" : "w-16 md:w-64 delay-0"
       }`}
     >
       <div
@@ -122,7 +122,7 @@ export function Sidebar({
           fixed left-0 top-0 z-50 flex h-full flex-col overflow-hidden bg-gh-bg-subtle pt-[env(safe-area-inset-top)]
           transition-[width] duration-300 ease-in-out
           md:relative md:left-auto md:top-auto md:z-20 md:pt-0
-          ${collapsed ? "w-16 md:w-16 delay-100" : "w-[min(16rem,85vw)] max-w-64 md:w-64 delay-0"}
+          ${collapsed ? "w-16 md:w-16 delay-150" : "w-[min(16rem,85vw)] max-w-64 md:w-64 delay-0"}
         `}
       >
         {/* Chevron in fixed 64px strip - never moves during open/close */}
@@ -166,14 +166,17 @@ export function Sidebar({
           {/* Spacer when expanded - chevron strip stays fixed, this grows */}
           {!collapsed && <div className="min-w-0 flex-1" />}
         </div>
-        {/* Content fades out first (100ms) when closing; fades in after width done when opening - prevents folding */}
+        {/* Fixed-width content prevents text reflow/folding; mask reveals left-to-right */}
         <nav
-          className={`min-h-0 flex-1 overflow-y-auto pl-2 pr-2 py-1.5 pt-0 sm:pl-3 sm:pr-3 sm:py-2 sm:pt-0 transition-opacity duration-100 ease-out ${
+          className={`min-h-0 flex-1 overflow-x-hidden overflow-y-auto
+            [mask-image:linear-gradient(to_right,black_50%,transparent_50%)] [mask-size:200%_100%] [mask-repeat:no-repeat]
+            transition-[opacity,mask-position] duration-300 ease-out ${
             collapsed
-              ? "opacity-0 pointer-events-none overflow-hidden delay-0"
-              : "opacity-100 delay-300"
+              ? "opacity-0 pointer-events-none overflow-hidden [mask-position:100%_0] delay-0"
+              : "opacity-100 [mask-position:0_0] delay-0"
           }`}
         >
+          <div className="w-48 shrink-0 pl-2 pr-2 py-1.5 pt-0 sm:pl-3 sm:pr-3 sm:py-2 sm:pt-0">
               <button
                 type="button"
                 onClick={onNewChat}
@@ -327,6 +330,7 @@ export function Sidebar({
             })}
           </ul>
           {isAdmin && <SidebarUsers />}
+          </div>
         </nav>
       </aside>
     </div>
