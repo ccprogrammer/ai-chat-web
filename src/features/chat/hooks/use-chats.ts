@@ -31,6 +31,7 @@ export function useChats(currentChatId?: string) {
       chatCache.setChats(res.chats);
     } catch (err) {
       if (!cached?.length) setChats([]);
+      if (err instanceof ApiError && err.status === 401) return;
       showError(err instanceof ApiError ? err.message : "Failed to load chats");
     } finally {
       setLoading(false);
@@ -55,6 +56,7 @@ export function useChats(currentChatId?: string) {
       router.push(`/chat/${chat.id}`);
       return chat;
     } catch (err) {
+      if (err instanceof ApiError && err.status === 401) return;
       showError(err instanceof ApiError ? err.message : "Failed to create chat");
     } finally {
       setLoading(false);
@@ -72,6 +74,7 @@ export function useChats(currentChatId?: string) {
         router.push(`/chat/${res.chat_id}`);
         return res;
       } catch (err) {
+        if (err instanceof ApiError && err.status === 401) throw err;
         showError(
           err instanceof ApiError ? err.message : "Something went wrong"
         );
@@ -94,6 +97,7 @@ export function useChats(currentChatId?: string) {
           return next;
         });
       } catch (err) {
+        if (err instanceof ApiError && err.status === 401) return;
         showError(err instanceof ApiError ? err.message : "Failed to rename chat");
       }
     },
@@ -117,6 +121,7 @@ export function useChats(currentChatId?: string) {
           chatCache.setChats(next);
           return next;
         });
+        if (err instanceof ApiError && err.status === 401) return;
         showError(err instanceof ApiError ? err.message : "Failed to delete chat");
       }
       if (String(chatId) === String(currentChatId)) {

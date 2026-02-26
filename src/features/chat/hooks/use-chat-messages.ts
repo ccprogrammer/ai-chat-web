@@ -18,7 +18,7 @@ export function useChatMessages(chatId: string | undefined) {
   const { token } = useAuth();
   const { showError } = useToast();
   const [messages, setMessages] = useState<Message[]>(() =>
-    chatId ? (chatCache.getMessages(chatId) ?? []) : []
+    chatId ? (chatCache.getMessages(chatId) ?? []) : [],
   );
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
@@ -39,8 +39,9 @@ export function useChatMessages(chatId: string | undefined) {
         if (prev.some((m) => m.id < 0)) return prev;
         return cached?.length ? prev : [];
       });
+      if (err instanceof ApiError && err.status === 401) return;
       showError(
-        err instanceof ApiError ? err.message : "Failed to load messages"
+        err instanceof ApiError ? err.message : "Failed to load messages",
       );
     } finally {
       setLoading(false);
@@ -86,15 +87,18 @@ export function useChatMessages(chatId: string | undefined) {
         });
         return res;
       } catch (err) {
+        if (err instanceof ApiError && err.status === 401) {
+          return; // Keep optimistic message visible; session expired popup will show
+        }
         setMessages((prev) => prev.filter((m) => m.id !== -1));
         showError(
-          err instanceof ApiError ? err.message : "Failed to send message"
+          err instanceof ApiError ? err.message : "Failed to send message",
         );
       } finally {
         setSending(false);
       }
     },
-    [token, chatId, showError]
+    [token, chatId, showError],
   );
 
   return {

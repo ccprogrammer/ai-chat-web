@@ -19,7 +19,7 @@ type AuthContextValue = {
   isLoading: boolean;
   login: (email: string, password: string) => Promise<void>;
   register: (email: string, password: string) => Promise<void>;
-  logout: () => void;
+  logout: () => void | Promise<void>;
   refetchMe: () => Promise<void>;
   isAuthenticated: boolean;
 };
@@ -113,7 +113,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     window.location.href = "/chat";
   }, []);
 
-  const logout = useCallback(() => {
+  const logout = useCallback(async () => {
+    const t = getStoredToken();
+    if (t) {
+      try {
+        await authRepository.logout(t);
+      } catch {
+        // Ignore errors (e.g. already expired); clear local state anyway
+      }
+    }
     setToken(null);
     setEmail(null);
     setRole(null);

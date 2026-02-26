@@ -20,4 +20,10 @@ export const authDatasource = {
     }),
 
   getMe: (token: string) => request<User>("/auth/me", { token }),
+
+  logout: (token: string) =>
+    request<{ detail: string }>("/auth/logout", {
+      method: "POST",
+      token,
+    }),
 };

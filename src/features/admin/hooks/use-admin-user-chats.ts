@@ -25,6 +25,7 @@ export function useAdminUserChats(userId: string | undefined) {
       setChats(res.chats);
     } catch (err) {
       setChats([]);
+      if (err instanceof ApiError && err.status === 401) return;
       showError(
         err instanceof ApiError ? err.message : "Failed to load user chats"
       );

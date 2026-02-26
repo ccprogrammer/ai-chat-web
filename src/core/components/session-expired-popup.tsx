@@ -11,18 +11,16 @@ export function SessionExpiredPopup() {
   const { logout } = useAuth();
 
   useEffect(() => {
-    const handle = () => {
-      logout();
-      setOpen(true);
-    };
+    const handle = () => setOpen(true);
     window.addEventListener(SESSION_EXPIRED_EVENT, handle);
     return () => window.removeEventListener(SESSION_EXPIRED_EVENT, handle);
-  }, [logout]);
+  }, []);
 
   const handleDismiss = useCallback(() => {
     setOpen(false);
+    logout();
     router.replace("/login");
-  }, [router]);
+  }, [router, logout]);
 
   if (!open) return null;
 
@@ -41,7 +39,8 @@ export function SessionExpiredPopup() {
           Session expired
         </h2>
         <p className="mt-2 text-sm text-gh-fg-muted">
-          Your session has expired or you have been signed out. Please sign in again.
+          Your session has expired or you have been signed out. Please sign in
+          again.
         </p>
         <div className="mt-4 flex justify-end">
           <button

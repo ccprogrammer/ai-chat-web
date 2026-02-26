@@ -424,10 +424,10 @@ export function Sidebar({
                     <button
                       type="button"
                       role="menuitem"
-                      onClick={() => {
+                      onClick={async () => {
                         setUserMenuOpen(false);
                         chatCache.clearAll();
-                        logout();
+                        await logout();
                         router.replace("/");
                       }}
                       className="w-full px-3 py-2 text-left text-sm text-gh-danger hover:bg-gh-bg-subtle"

@@ -28,6 +28,7 @@ export function useAdminUsers() {
       adminCache.setUsers(list);
     } catch (err) {
       setUsers((prev) => (cached?.length ? prev : []));
+      if (err instanceof ApiError && err.status === 401) return;
       showError(err instanceof ApiError ? err.message : "Failed to load users");
     } finally {
       setLoading(false);
@@ -51,6 +52,7 @@ export function useAdminUsers() {
         );
         return updated;
       } catch (err) {
+        if (err instanceof ApiError && err.status === 401) return;
         showError(
           err instanceof ApiError ? err.message : "Failed to update role"
         );

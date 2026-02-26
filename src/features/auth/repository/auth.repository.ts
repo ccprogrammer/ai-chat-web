@@ -14,4 +14,6 @@ export const authRepository = {
   },
 
   getMe: (token: string) => authDatasource.getMe(token),
+
+  logout: (token: string) => authDatasource.logout(token),
 };

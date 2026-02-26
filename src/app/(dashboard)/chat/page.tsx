@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { ApiError } from "@/core/api";
 import {
   useChats,
   DashboardNavbar,
@@ -38,7 +39,8 @@ export default function ChatIndexPage() {
     setPendingMessage(message);
     try {
       await sendMessageFromNewChat(message);
-    } catch {
+    } catch (err) {
+      if (err instanceof ApiError && err.status === 401) return;
       setPendingMessage(null);
     }
   };
