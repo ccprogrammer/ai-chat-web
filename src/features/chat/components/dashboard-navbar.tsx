@@ -5,13 +5,11 @@ import { useRef, useState, useEffect } from "react";
 import { useAuth } from "@/features/auth";
 import { chatCache } from "../cache/chat-cache";
 import { useTheme } from "@/core/components/theme-provider";
-import { useSidebar } from "@/core/context/sidebar-context";
 
 export function DashboardNavbar() {
   const { logout, email } = useAuth();
   const router = useRouter();
   const { theme, toggleTheme } = useTheme();
-  const { toggle } = useSidebar();
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
@@ -27,30 +25,7 @@ export function DashboardNavbar() {
 
   return (
     <header className="flex min-h-14 shrink-0 items-center justify-between gap-2 bg-gh-bg px-2 pt-[env(safe-area-inset-top,0px)] sm:px-4 sm:pt-0 md:absolute md:left-0 md:right-0 md:top-0 md:z-10 md:bg-transparent">
-      <div className="flex items-center gap-1 sm:gap-2">
-        <button
-          type="button"
-          onClick={toggle}
-          className="-m-2 flex min-h-[44px] min-w-[44px] items-center justify-center rounded p-2 text-gh-fg-muted hover:bg-gh-bg-subtle hover:text-gh-fg"
-          aria-label="Toggle menu"
-        >
-          <svg
-            width="20"
-            height="20"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <line x1="3" y1="6" x2="21" y2="6" />
-            <line x1="3" y1="12" x2="21" y2="12" />
-            <line x1="3" y1="18" x2="21" y2="18" />
-          </svg>
-        </button>
-      </div>
-      <div className="flex items-center gap-2">
+      <div className="flex flex-1 items-center justify-end gap-2">
         <button
           type="button"
           onClick={toggleTheme}
