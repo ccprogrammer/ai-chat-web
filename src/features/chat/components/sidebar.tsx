@@ -148,9 +148,9 @@ export function Sidebar({
           ${collapsed ? "w-12 md:w-12" : "w-[min(16rem,85vw)] max-w-64 md:w-64"}
         `}
       >
-        {/* Chevron in fixed 48px strip - never moves during open/close */}
-        <div className="flex shrink-0 flex-row">
-          <div className="flex w-12 shrink-0 flex-col items-center py-1">
+        {/* Top row: chevron + spacer */}
+        <div className="flex shrink-0 flex-row px-1.5 py-1.5">
+          <div className="flex shrink-0 items-center">
             <button
             type="button"
             onClick={toggle}
@@ -186,7 +186,6 @@ export function Sidebar({
             )}
           </button>
           </div>
-          {/* Spacer when expanded - chevron strip stays fixed, this grows */}
           {!collapsed && <div className="min-w-0 flex-1" />}
         </div>
         {/* Fixed-width content prevents text reflow/folding; mask reveals left-to-right (strip 48px, content 208px) */}
@@ -199,7 +198,7 @@ export function Sidebar({
               : "opacity-100 [mask-position:0_0] delay-0"
           }`}
         >
-          <div className="w-52 shrink-0 pl-2 pr-2 py-1.5 pt-0 sm:pr-3 sm:py-2 sm:pt-0">
+          <div className="w-52 shrink-0 px-1.5 py-1.5 pt-0 sm:pr-3 sm:py-2 sm:pt-0">
               <button
                 type="button"
                 onClick={onNewChat}
@@ -355,49 +354,53 @@ export function Sidebar({
           {isAdmin && <SidebarUsers />}
           </div>
         </nav>
-        {/* Footer: each row = icon + text, icons fixed, text fades */}
-        <div className="flex shrink-0 flex-col gap-0.5 pl-2 pr-2 py-1.5 pb-[max(0.5rem,env(safe-area-inset-bottom))] sm:pr-3">
-          <div className="flex min-h-[36px] items-center gap-2">
-            <button
-              type="button"
-              onClick={toggleTheme}
-              className="flex h-9 w-9 shrink-0 items-center justify-center rounded p-1.5 text-gh-fg-muted hover:bg-gh-border-muted hover:text-gh-fg"
-              aria-label={theme === "dark" ? "Switch to light" : "Switch to dark"}
-            >
+        {/* Footer */}
+        <div
+          className={`flex shrink-0 flex-col gap-0.5 px-1.5 py-1.5 pb-[max(0.5rem,env(safe-area-inset-bottom))] ${
+            collapsed ? "" : "sm:pr-3"
+          }`}
+        >
+          <button
+            type="button"
+            onClick={toggleTheme}
+            className="flex min-h-[32px] w-full min-w-0 items-center gap-2 rounded-lg px-1.5 py-1.5 text-left text-gh-fg-muted hover:bg-gh-border-muted hover:text-gh-fg"
+            aria-label={theme === "dark" ? "Switch to light" : "Switch to dark"}
+          >
+            <span className="flex h-7 w-7 shrink-0 items-center justify-center">
               {theme === "dark" ? (
-                <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <circle cx="12" cy="12" r="5" />
                   <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" />
                 </svg>
               ) : (
-                <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
                 </svg>
               )}
-            </button>
+            </span>
             <span
-              className={`min-w-0 overflow-hidden text-xs text-gh-fg-muted transition-opacity duration-300 ease-out ${
+              className={`min-w-0 overflow-hidden text-xs transition-opacity duration-300 ease-out ${
                 collapsed ? "pointer-events-none opacity-0" : "opacity-100"
               }`}
             >
               Theme
             </span>
-          </div>
-          <div className="flex min-h-[36px] items-center gap-2">
-            <div className="relative shrink-0" ref={userMenuRef}>
-              <button
-                type="button"
-                onClick={() => setUserMenuOpen((o) => !o)}
-                className="flex h-9 w-9 items-center justify-center rounded p-1.5 text-gh-fg-muted hover:bg-gh-border-muted hover:text-gh-fg"
-                aria-label="Account menu"
-                aria-expanded={userMenuOpen}
-                aria-haspopup="true"
-              >
-                <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          </button>
+          <div className="relative w-full" ref={userMenuRef}>
+            <button
+              type="button"
+              onClick={() => setUserMenuOpen((o) => !o)}
+              className="flex min-h-[32px] w-full min-w-0 items-center gap-2 rounded-lg px-1.5 py-1.5 text-left text-gh-fg-muted hover:bg-gh-border-muted hover:text-gh-fg"
+              aria-label="Account menu"
+              aria-expanded={userMenuOpen}
+              aria-haspopup="true"
+            >
+              <span className="flex h-7 w-7 shrink-0 items-center justify-center">
+                <svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
                   <circle cx="12" cy="7" r="4" />
                 </svg>
-              </button>
+              </span>
               {userMenuOpen &&
                 typeof document !== "undefined" &&
                 userMenuRef.current &&
@@ -434,14 +437,14 @@ export function Sidebar({
                   </div>,
                   document.body
                 )}
-            </div>
             <span
-              className={`min-w-0 overflow-hidden text-xs text-gh-fg-muted transition-opacity duration-300 ease-out ${
+              className={`min-w-0 overflow-hidden text-xs transition-opacity duration-300 ease-out ${
                 collapsed ? "pointer-events-none opacity-0" : "opacity-100"
               }`}
             >
               Account
             </span>
+          </button>
           </div>
         </div>
       </aside>
