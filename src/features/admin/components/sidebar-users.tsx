@@ -1,7 +1,9 @@
 "use client";
 
 import Link from "next/link";
+import { createPortal } from "react-dom";
 import { usePathname } from "next/navigation";
+import { useState } from "react";
 import { useAuth } from "@/features/auth";
 import { useAdminUsers } from "../hooks/use-admin-users";
 
@@ -9,24 +11,33 @@ export function SidebarUsers() {
   const pathname = usePathname();
   const { refetchMe, email: currentEmail } = useAuth();
   const { users, loading, updateRole } = useAdminUsers();
+  const [confirming, setConfirming] = useState<{
+    userId: string;
+    currentRole: string;
+    userEmail: string;
+  } | null>(null);
 
-  const handleMakeAdmin = async (
+  const handleMakeAdminClick = (
     e: React.MouseEvent,
     userId: string,
-    currentRole: string
+    currentRole: string,
+    userEmail: string
   ) => {
     e.preventDefault();
     e.stopPropagation();
-    const newRole = currentRole === "admin" ? "user" : "admin";
-    if (
-      typeof window === "undefined" ||
-      window.confirm(
-        `Set role to "${newRole}"?`
-      )
-    ) {
-      await updateRole(userId, newRole);
-      await refetchMe();
-    }
+    setConfirming({ userId, currentRole, userEmail });
+  };
+
+  const handleConfirm = async () => {
+    if (!confirming) return;
+    const newRole = confirming.currentRole === "admin" ? "user" : "admin";
+    await updateRole(confirming.userId, newRole);
+    await refetchMe();
+    setConfirming(null);
+  };
+
+  const handleCancel = () => {
+    setConfirming(null);
   };
 
   return (
@@ -63,7 +74,9 @@ export function SidebarUsers() {
                   </span>
                   <button
                     type="button"
-                    onClick={(e) => handleMakeAdmin(e, user.id, user.role)}
+                    onClick={(e) =>
+                      handleMakeAdminClick(e, user.id, user.role, user.email)
+                    }
                     className="shrink-0 rounded px-1.5 py-0.5 text-xs text-gh-accent hover:bg-gh-border-muted"
                     title={role === "admin" ? "Demote to user" : "Make admin"}
                   >
@@ -75,6 +88,55 @@ export function SidebarUsers() {
           })}
         </ul>
       )}
+      {confirming &&
+        typeof document !== "undefined" &&
+        createPortal(
+          <div
+            className="fixed inset-0 z-[60] flex items-center justify-center bg-black/50 p-4"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="role-confirm-title"
+            onClick={handleCancel}
+          >
+            <div
+              className="w-full max-w-sm rounded-lg border border-gh-border bg-gh-bg p-4 shadow-lg"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <h2
+                id="role-confirm-title"
+                className="text-sm font-medium text-gh-fg"
+              >
+                {confirming.currentRole === "admin"
+                  ? "Demote to user"
+                  : "Make admin"}
+              </h2>
+              <p className="mt-2 text-sm text-gh-fg-muted">
+                Set{" "}
+                <strong className="text-gh-fg">{confirming.userEmail}</strong> to{" "}
+                {confirming.currentRole === "admin" ? "user" : "admin"}?
+              </p>
+              <div className="mt-4 flex justify-end gap-2">
+                <button
+                  type="button"
+                  onClick={handleCancel}
+                  className="gh-btn px-3 py-1.5 text-sm"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  onClick={handleConfirm}
+                  className="gh-btn gh-btn-primary px-3 py-1.5 text-sm"
+                >
+                  {confirming.currentRole === "admin"
+                    ? "Demote"
+                    : "Make admin"}
+                </button>
+              </div>
+            </div>
+          </div>,
+          document.body
+        )}
     </div>
   );
 }

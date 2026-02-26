@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { createPortal } from "react-dom";
 import { usePathname, useRouter } from "next/navigation";
 import { useRef, useState, useEffect } from "react";
 import { useSidebar } from "@/core/context/sidebar-context";
@@ -47,6 +48,7 @@ export function Sidebar({
   const [menuOpenId, setMenuOpenId] = useState<string | null>(null);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const userMenuRef = useRef<HTMLDivElement>(null);
+  const userMenuPopoverRef = useRef<HTMLDivElement>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editingTitle, setEditingTitle] = useState("");
   const [savingId, setSavingId] = useState<string | null>(null);
@@ -74,7 +76,12 @@ export function Sidebar({
   useEffect(() => {
     if (!userMenuOpen) return;
     const closeUserMenu = (e: MouseEvent) => {
-      if (userMenuRef.current?.contains(e.target as Node)) return;
+      const target = e.target as Node;
+      if (
+        userMenuRef.current?.contains(target) ||
+        userMenuPopoverRef.current?.contains(target)
+      )
+        return;
       setUserMenuOpen(false);
     };
     document.addEventListener("click", closeUserMenu);
@@ -391,32 +398,42 @@ export function Sidebar({
                   <circle cx="12" cy="7" r="4" />
                 </svg>
               </button>
-              {userMenuOpen && (
-                <div
-                  className="absolute bottom-full left-0 z-20 mb-1 min-w-[200px] rounded-lg border border-gh-border bg-gh-bg py-2 shadow-lg"
-                  role="menu"
-                >
-                  <div className="px-3 py-2">
-                    <p className="text-xs font-medium text-gh-fg-muted">Email</p>
-                    <p className="truncate text-sm text-gh-fg" title={email ?? undefined}>
-                      {email ?? "—"}
-                    </p>
-                  </div>
-                  <button
-                    type="button"
-                    role="menuitem"
-                    onClick={() => {
-                      setUserMenuOpen(false);
-                      chatCache.clearAll();
-                      logout();
-                      router.replace("/");
+              {userMenuOpen &&
+                typeof document !== "undefined" &&
+                userMenuRef.current &&
+                createPortal(
+                  <div
+                    ref={userMenuPopoverRef}
+                    className="fixed z-50 min-w-[200px] rounded-lg border border-gh-border bg-gh-bg py-2 shadow-lg"
+                    role="menu"
+                    style={{
+                      left: userMenuRef.current.getBoundingClientRect().left,
+                      top: userMenuRef.current.getBoundingClientRect().top - 8,
+                      transform: "translateY(-100%)",
                     }}
-                    className="w-full px-3 py-2 text-left text-sm text-gh-danger hover:bg-gh-bg-subtle"
                   >
-                    Sign out
-                  </button>
-                </div>
-              )}
+                    <div className="px-3 py-2">
+                      <p className="text-xs font-medium text-gh-fg-muted">Email</p>
+                      <p className="truncate text-sm text-gh-fg" title={email ?? undefined}>
+                        {email ?? "—"}
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      role="menuitem"
+                      onClick={() => {
+                        setUserMenuOpen(false);
+                        chatCache.clearAll();
+                        logout();
+                        router.replace("/");
+                      }}
+                      className="w-full px-3 py-2 text-left text-sm text-gh-danger hover:bg-gh-bg-subtle"
+                    >
+                      Sign out
+                    </button>
+                  </div>,
+                  document.body
+                )}
             </div>
             <span
               className={`min-w-0 overflow-hidden text-xs text-gh-fg-muted transition-opacity duration-300 ease-out ${
