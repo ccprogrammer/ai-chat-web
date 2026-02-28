@@ -58,7 +58,7 @@ export default function ChatIndexPage() {
     : [];
 
   return (
-    <div className="flex h-mobile-screen w-full min-w-0 items-stretch overflow-hidden">
+    <div className="flex h-mobile-screen w-full min-w-0 flex-col items-stretch overflow-hidden md:flex-row">
       <Sidebar
         chats={chats}
         onNewChat={() => router.push("/chat")}

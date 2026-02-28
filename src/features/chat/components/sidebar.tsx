@@ -129,10 +129,33 @@ export function Sidebar({
 
   return (
     <div
-      className={`flex h-full min-h-0 shrink-0 flex-col overflow-hidden transition-[width] duration-300 ease-in-out ${
-        collapsed ? "w-12 md:w-12" : "w-12 md:w-64"
-      }`}
+      className={`flex shrink-0 flex-col overflow-hidden transition-[width] duration-300 ease-in-out
+        h-12 w-full md:h-full md:min-h-0
+        ${collapsed ? "md:w-12" : "md:w-64"}
+      `}
     >
+      {/* Mobile: fixed top bar with chevron - always visible */}
+      <div
+        className="fixed left-0 right-0 top-0 z-[60] flex h-12 shrink-0 items-center bg-gh-bg-subtle px-1.5 pt-[env(safe-area-inset-top)] md:hidden"
+        aria-hidden="true"
+      >
+        <button
+          type="button"
+          onClick={toggle}
+          className="flex min-h-[36px] min-w-[36px] items-center justify-center rounded p-1.5 text-gh-fg-muted hover:bg-gh-border-muted hover:text-gh-fg"
+          aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+        >
+          {collapsed ? (
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M9 18l6-6-6-6" />
+            </svg>
+          ) : (
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M15 18l-6-6 6-6" />
+            </svg>
+          )}
+        </button>
+      </div>
       <div
         className={`fixed inset-0 z-40 bg-black/50 transition-opacity duration-300 md:hidden ${
           collapsed ? "pointer-events-none opacity-0" : "opacity-100"
@@ -142,14 +165,19 @@ export function Sidebar({
       />
       <aside
         className={`
-          fixed left-0 top-0 z-50 flex h-full flex-col overflow-hidden bg-gh-bg-subtle pt-[env(safe-area-inset-top)]
-          transition-[width] duration-300 ease-in-out
-          md:relative md:left-auto md:top-auto md:z-20 md:pt-0
-          ${collapsed ? "w-12 md:w-12" : "w-[min(16rem,85vw)] max-w-64 md:w-64"}
+          flex flex-col overflow-hidden bg-gh-bg-subtle
+          max-md:will-change-transform
+          transition-[transform,width] duration-300 ease-out
+          md:relative md:top-auto md:z-20 md:h-full md:pt-0 md:transition-[width] md:will-change-auto
+          max-md:fixed max-md:left-0 max-md:top-12 max-md:z-50 max-md:h-[calc(100dvh-3rem)] max-md:w-[min(16rem,85vw)] max-md:max-w-64 max-md:pt-0
+          ${collapsed
+            ? "max-md:-translate-x-full max-md:pointer-events-none md:w-12"
+            : "max-md:translate-x-0 md:w-64"
+          }
         `}
       >
-        {/* Top row: chevron + spacer */}
-        <div className="flex shrink-0 flex-row px-1.5 py-1.5">
+        {/* Top row: chevron + spacer - desktop only (mobile has separate top bar) */}
+        <div className="hidden shrink-0 flex-row px-1.5 py-1.5 md:flex">
           <div className="flex shrink-0 items-center">
             <button
             type="button"
@@ -158,29 +186,11 @@ export function Sidebar({
             aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
           >
             {collapsed ? (
-              <svg
-                width="18"
-                height="18"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M9 18l6-6-6-6" />
               </svg>
             ) : (
-              <svg
-                width="18"
-                height="18"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M15 18l-6-6 6-6" />
               </svg>
             )}
@@ -188,14 +198,15 @@ export function Sidebar({
           </div>
           {!collapsed && <div className="min-w-0 flex-1" />}
         </div>
-        {/* Fixed-width content prevents text reflow/folding; mask reveals left-to-right (strip 48px, content 208px) */}
+        {/* Fixed-width content; mask for desktop collapsed animation; on mobile drawer show all */}
         <nav
           className={`min-h-0 flex-1 overflow-x-hidden overflow-y-auto
-            [mask-image:linear-gradient(to_right,black_50%,transparent_50%)] [mask-size:200%_100%] [mask-repeat:no-repeat]
+            max-md:[mask-image:none]
+            md:[mask-image:linear-gradient(to_right,black_50%,transparent_50%)] md:[mask-size:200%_100%] md:[mask-repeat:no-repeat]
             transition-[opacity,mask-position] duration-300 ease-out ${
             collapsed
-              ? "opacity-0 pointer-events-none overflow-hidden [mask-position:100%_0] delay-0"
-              : "opacity-100 [mask-position:0_0] delay-0"
+              ? "opacity-0 pointer-events-none overflow-hidden md:[mask-position:100%_0] delay-0"
+              : "opacity-100 md:[mask-position:0_0] delay-0"
           }`}
         >
           <div className="w-52 shrink-0 px-1.5 py-1.5 pt-0 sm:pr-3 sm:py-2 sm:pt-0">

@@ -37,7 +37,7 @@ export default function AdminUserChatsPage() {
   const handleDeleteChat = (id: string) => deleteChat(id);
 
   return (
-    <div className="flex h-screen min-h-0 w-full items-stretch overflow-hidden">
+    <div className="flex h-screen min-h-0 w-full flex-col items-stretch overflow-hidden md:flex-row">
       <Sidebar
         chats={myChats}
         onNewChat={() => router.push("/chat")}
