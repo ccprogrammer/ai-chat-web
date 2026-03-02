@@ -43,7 +43,10 @@ export default function ChatThreadPage() {
     el.scrollTop = el.scrollHeight - el.clientHeight;
   }, [messages.length, loadingMessages, sending]);
 
-  const isEmpty = messages.length === 0 && !loadingMessages;
+  // When messages are empty, show the "Hi there" state with Composer so we never show a blank
+  // screen. Previously, isEmpty required !loadingMessages, which caused a blank state when
+  // loading after navigation (empty MessageList + Composer hidden by !loadingMessages).
+  const isEmpty = messages.length === 0;
 
   return (
     <div className="flex h-mobile-screen w-full min-w-0 flex-col items-stretch overflow-hidden md:flex-row">

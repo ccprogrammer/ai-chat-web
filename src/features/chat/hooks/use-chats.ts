@@ -7,7 +7,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { ApiError } from "@/core/api";
-import type { Chat } from "@/core/types";
+import type { Chat, Message } from "@/core/types";
 import { useAuth } from "@/features/auth";
 import { useToast } from "@/core/context/toast-context";
 import { chatRepository } from "../repository/chat.repository";
@@ -70,6 +70,24 @@ export function useChats(currentChatId?: string) {
       setSending(true);
       try {
         const res = await chatRepository.sendMessage(token, { message });
+        const now = new Date().toISOString();
+        const preCachedMessages: Message[] = [
+          {
+            id: 1,
+            chat_id: res.chat_id,
+            role: "user",
+            content: message,
+            created_at: now,
+          },
+          {
+            id: 2,
+            chat_id: res.chat_id,
+            role: "assistant",
+            content: res.reply,
+            created_at: now,
+          },
+        ];
+        chatCache.setMessages(res.chat_id, preCachedMessages);
         await refetch();
         router.push(`/chat/${res.chat_id}`);
         return res;
